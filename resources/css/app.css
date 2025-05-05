@@ -1,0 +1,9 @@
+/* Mengimpor kelas Tailwind */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Menambahkan custom style jika diperlukan */
+body {
+font-family: 'Poppins', sans-serif;
+}
