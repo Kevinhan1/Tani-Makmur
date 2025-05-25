@@ -24,7 +24,7 @@
             </thead>
             <tbody>
                 @foreach ($rekening as $item)
-                    <tr class="border-t">
+                    <tr class="border-t {{ $item->aktif ? '' : 'text-gray-400' }}">
                         <td class="px-4 py-2 text-center">
                             <input type="checkbox" class="item-checkbox cursor-pointer accent-gray-400" value="{{ $item->koderekening }}" onchange="updateActionButtons()" style="width:14px; height:14px;">
                         </td>

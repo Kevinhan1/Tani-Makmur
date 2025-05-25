@@ -94,6 +94,12 @@
                 </a>
             </li>
             <li>
+                <a href="{{ route('pindahsaldo.index') }}" 
+                class="w-full flex items-center justify-between px-2 py-2 hover:bg-gray-100 rounded transition text-black-100">
+                    Pindah Saldo Rekening
+                </a>
+            </li>
+            <li>
                 <a href="{{ route('penjualan.index') }}" 
                 class="w-full flex items-center justify-between px-2 py-2 hover:bg-gray-100 rounded transition text-black-100">
                     Penjualan

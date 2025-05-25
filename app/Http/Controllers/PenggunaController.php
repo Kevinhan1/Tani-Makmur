@@ -52,7 +52,7 @@ class PenggunaController extends Controller
         'updated_at' => now(),
     ]);
 
-    return redirect('/')->with('success', 'Pengguna berhasil ditambahkan.');
+    return redirect('/login')->with('success', 'Pengguna berhasil ditambahkan.');
 }
 
 

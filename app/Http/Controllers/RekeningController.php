@@ -8,8 +8,8 @@ use App\Models\Rekening;
 class RekeningController extends Controller
 {
     public function index()
-    {
-        $rekening = Rekening::orderBy('koderekening')->get();
+    {   
+        $rekening = Rekening::all();
 
         // Generate next kode rekening (format R-001, R-002, ...)
         $last = Rekening::orderBy('koderekening', 'desc')->first();

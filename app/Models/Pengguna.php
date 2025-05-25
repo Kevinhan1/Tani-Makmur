@@ -10,8 +10,10 @@ class Pengguna extends Model
     use HasFactory;
 
     protected $table = 'tpengguna';
+    protected $primaryKey = 'kodepengguna';
     public $timestamps = false;
-
+    public $incrementing = false;
+    protected $keyType = 'string';
     protected $fillable = [
         'namapengguna',
         'katakunci',

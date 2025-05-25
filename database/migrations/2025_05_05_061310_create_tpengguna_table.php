@@ -14,10 +14,10 @@ return new class extends Migration
     Schema::create('tpengguna', function (Blueprint $table) {
         $table->id(); // otomatis increment
         $table->string('namapengguna');
-        $table->string('katakunci'); // nanti akan di-hash
+        $table->string('katakunci', 255); // nanti akan di-hash
         $table->boolean('status')->default(1); // 1 aktif, 0 tidak aktif
         $table->string('tipe')->default('admin'); // fix 'admin'
-        $table->timestamps();
+        $table->timestamps(false);
     });
 }
 

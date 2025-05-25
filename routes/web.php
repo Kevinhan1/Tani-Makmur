@@ -8,6 +8,9 @@ use App\Http\Controllers\BarangController;
 use App\Http\Controllers\PemasokController;
 use App\Http\Controllers\PelangganController;
 use App\Http\Controllers\RekeningController;
+use App\Http\Controllers\BiayaController;
+use App\Http\Controllers\PindahSaldoController;
+
 
 // Halaman utama
 Route::get('/', function () {
@@ -38,37 +41,28 @@ Route::get('dashboard', function () {
 
 //Master
 //Barang
-Route::get('/barang', [BarangController::class, 'index'])->name('barang.index');
-Route::post('/barang', [BarangController::class, 'store'])->name('barang.store');
 Route::resource('barang', BarangController::class);
-Route::put('/barang/{kodebarang}', [BarangController::class, 'update'])->name('barang.update');
-Route::delete('/barang/{kodebarang}', [BarangController::class, 'destroy'])->name('barang.destroy');
-
 
 //Pemasok
-Route::get('/pemasok', [PemasokController::class, 'index'])->name('pemasok.index');
-Route::post('/pemasok', [PemasokController::class, 'store'])->name('pemasok.store');
 Route::resource('pemasok', PemasokController::class);
-Route::put('/pemasok/{kodepemasok}', [PemasokController::class, 'update'])->name('pemasok.update');
-Route::delete('/pemasok/{kodepemasok}', [PemasokController::class, 'destroy'])->name('pemasok.destroy');
-
 
 //Pelanggan
-Route::get('/pelanggan', [PelangganController::class, 'index'])->name('pelanggan.index');
-Route::post('/pelanggan', [PelangganController::class, 'store'])->name('pelanggan.store');
 Route::resource('pelanggan', PelangganController::class);
-Route::put('/pelanggan/{kodepelanggan}', [PelangganController::class, 'update'])->name('pelanggan.update');
-Route::delete('/pelanggan/{kodepelanggan}', [PelangganController::class, 'destroy'])->name('pelanggan.destroy');
-
 //Rekening
-Route::get('/rekening', [RekeningController::class, 'index'])->name('rekening.index');
-Route::post('/rekening', [RekeningController::class, 'store'])->name('rekening.store');
 Route::resource('rekening', RekeningController::class);
-Route::put('/rekening/{koderekening}', [RekeningController::class, 'update'])->name('rekening.update');
-Route::delete('/rekening/{koderekening}', [RekeningController::class, 'destroy'])->name('rekening.destroy');
 
 
+//Transaksi 
+// Biaya
+Route::resource('biaya', BiayaController::class);
 
+// Pindah Buku
+Route::resource('pindahsaldo', PindahSaldoController::class);
+
+Route::get('/penjualan', [BarangController::class, 'index'])->name('penjualan.index');
+Route::get('/pembelian', [BarangController::class, 'index'])->name('pembelian.index');
+Route::get('/pembayaran-pembelian', [BarangController::class, 'index'])->name('pembayaranpembelian.index');
+Route::get('/pembayaran-penjualan', [BarangController::class, 'index'])->name('pembayaranpenjualan.index');
 
 //laporan 
 Route::get('/mutasi-rekening', [BarangController::class, 'index'])->name('mutasirekening.index');
@@ -78,10 +72,3 @@ Route::get('/piutang', [BarangController::class, 'index'])->name('piutang.index'
 Route::get('/laporan-penjualan', [BarangController::class, 'index'])->name('laporanpenjualan.index');
 
 
-//Transaksi 
-Route::get('/biaya', [BarangController::class, 'index'])->name('biaya.index');
-Route::get('/pindah-saldo-rekening', [BarangController::class, 'index'])->name('pindahsaldorekening.index');
-Route::get('/penjualan', [BarangController::class, 'index'])->name('penjualan.index');
-Route::get('/pembelian', [BarangController::class, 'index'])->name('pembelian.index');
-Route::get('/pembayaran-pembelian', [BarangController::class, 'index'])->name('pembayaranpembelian.index');
-Route::get('/pembayaran-penjualan', [BarangController::class, 'index'])->name('pembayaranpenjualan.index');

@@ -37,7 +37,7 @@
             </thead>
             <tbody>
                 @foreach ($pelanggan as $item)
-                <tr class="border-t">
+                <tr class="border-t {{ $item->aktif ? '' : 'text-gray-400' }}">
                     <td class="px-4 py-2 text-center">
                         <input type="checkbox" class="item-checkbox cursor-pointer accent-gray-400" value="{{ $item->kodepelanggan }}" onchange="updateActionButtons()" style="width:14px; height:14px;">
                     </td>
@@ -105,9 +105,9 @@
                 </div>		
 												<!--6--> 
 															<div>
-                   <label for="ktp" class="block text-sm font-medium">KTP</label>
-                   <input type="text" name="ktp" id="ktp" class="w-full border rounded px-3 py-2">
-               </div>
+                    <label for="ktp" class="block text-sm font-medium">KTP</label>
+                    <input type="text" name="ktp" id="ktp" class="w-full border rounded px-3 py-2">
+                </div>
 												<!--7--> 
 																<div>
                     <label for="alamat" class="block text-sm font-medium">Alamat</label>

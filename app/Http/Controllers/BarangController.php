@@ -10,7 +10,7 @@ class BarangController extends Controller
     // Tampilkan halaman data barang + form tambah dengan nextCode
     public function index()
     {
-        $barang = Barang::where('aktif', 1)->get();
+        $barang = Barang::all();
 
         $nextCode = $this->getNextKodeBarang();
 
