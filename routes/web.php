@@ -10,6 +10,7 @@ use App\Http\Controllers\PelangganController;
 use App\Http\Controllers\RekeningController;
 use App\Http\Controllers\BiayaController;
 use App\Http\Controllers\PindahSaldoController;
+use App\Http\Controllers\MutasiRekeningController;
 
 
 // Halaman utama
@@ -65,7 +66,10 @@ Route::get('/pembayaran-pembelian', [BarangController::class, 'index'])->name('p
 Route::get('/pembayaran-penjualan', [BarangController::class, 'index'])->name('pembayaranpenjualan.index');
 
 //laporan 
-Route::get('/mutasi-rekening', [BarangController::class, 'index'])->name('mutasirekening.index');
+//Mutasi Rekening
+Route::get('/mutasi-rekening', [MutasiRekeningController::class, 'index'])->name('mutasirekening.index');
+
+
 Route::get('/mutasi-stok', [BarangController::class, 'index'])->name('mutasistok.index');
 Route::get('/kas', [BarangController::class, 'index'])->name('kas.index');
 Route::get('/piutang', [BarangController::class, 'index'])->name('piutang.index');
