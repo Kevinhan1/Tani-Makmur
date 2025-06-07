@@ -4,5 +4,5 @@
 @section('page', 'Dashboard')
 
 @section('content')
-    <p class="text-xl">Selamat datang, {{ session('user')->namapengguna }}!</p>
+    <h2 class="text-2xl font-semibold mb-4">Selamat Datang, {{ session('user')->namapengguna }}!</h2>
 @endsection

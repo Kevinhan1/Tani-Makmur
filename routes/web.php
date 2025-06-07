@@ -11,6 +11,8 @@ use App\Http\Controllers\RekeningController;
 use App\Http\Controllers\BiayaController;
 use App\Http\Controllers\PindahSaldoController;
 use App\Http\Controllers\MutasiRekeningController;
+use App\Http\Controllers\PenjualanController;
+use App\Http\Controllers\PembelianController;
 
 
 // Halaman utama
@@ -60,14 +62,15 @@ Route::resource('biaya', BiayaController::class);
 // Pindah Buku
 Route::resource('pindahsaldo', PindahSaldoController::class);
 
-Route::get('/penjualan', [BarangController::class, 'index'])->name('penjualan.index');
-Route::get('/pembelian', [BarangController::class, 'index'])->name('pembelian.index');
+Route::resource('/penjualan', PenjualanController::class);
+Route::resource('/pembelian', PembelianController::class);
 Route::get('/pembayaran-pembelian', [BarangController::class, 'index'])->name('pembayaranpembelian.index');
 Route::get('/pembayaran-penjualan', [BarangController::class, 'index'])->name('pembayaranpenjualan.index');
 
 //laporan 
 //Mutasi Rekening
 Route::get('/mutasi-rekening', [MutasiRekeningController::class, 'index'])->name('mutasirekening.index');
+
 
 
 Route::get('/mutasi-stok', [BarangController::class, 'index'])->name('mutasistok.index');

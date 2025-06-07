@@ -10,14 +10,14 @@
     <table class="w-full text-left border-collapse">
         <thead>
             <tr class="text-gray-500">
-                <th class="px-4 py-2">No. Generate</th>
-                <th class="px-4 py-2">Tanggal</th>
-                <th class="px-4 py-2">No. Referensi</th>
-                <th class="px-4 py-2">Kode Rekening</th>
-                <th class="px-4 py-2">Masuk</th>
-                <th class="px-4 py-2">Keluar</th>
-                <th class="px-4 py-2">Jenis</th>
-                <th class="px-4 py-2">Keterangan</th>
+                <th class="px-4 py-2 font-normal">No. Generate</th>
+                <th class="px-4 py-2 font-normal">Tanggal</th>
+                <th class="px-4 py-2 font-normal">No. Referensi</th>
+                <th class="px-4 py-2 font-normal">Nama Rekening</th>
+                <th class="px-4 py-2 font-normal">Masuk</th>
+                <th class="px-4 py-2 font-normal">Keluar</th>
+                <th class="px-4 py-2 font-normal">Jenis</th>
+                <th class="px-4 py-2 font-normal">Keterangan</th>
             </tr>
         </thead>
         <tbody>
@@ -26,7 +26,7 @@
                     <td class="px-4 py-2">{{ $item->nogenerate }}</td>
                     <td class="px-4 py-2">{{ \Carbon\Carbon::parse($item->tanggal)->format('d-m-Y') }}</td>
                     <td class="px-4 py-2">{{ $item->noreferensi }}</td>
-                    <td class="px-4 py-2">{{ $item->koderekening }}</td>
+                    <td class="px-4 py-2">{{ $item->rekening->namarekening ?? '-' }}</td>
                     <td class="px-4 py-2 text-green-600">Rp{{ number_format($item->masuk, 0, ',', '.') }}</td>
                     <td class="px-4 py-2 text-red-600">Rp{{ number_format($item->keluar, 0, ',', '.') }}</td>
                     <td class="px-4 py-2">{{ $item->jenis }}</td>
