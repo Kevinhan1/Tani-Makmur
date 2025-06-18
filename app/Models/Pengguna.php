@@ -15,9 +15,10 @@ class Pengguna extends Model
     public $incrementing = false;
     protected $keyType = 'string';
     protected $fillable = [
+        'aktif',
+        'kodepengguna',
         'namapengguna',
         'katakunci',
         'status',
-        'tipe',
     ];
 }

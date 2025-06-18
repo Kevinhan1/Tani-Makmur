@@ -8,9 +8,21 @@ use Illuminate\Http\Request;
 class PemasokController extends Controller
 {
     // Menampilkan halaman dan data pemasok
-    public function index()
-    {
-        $pemasok = Pemasok::all();
+    public function index(Request $request)
+    {   
+        $query = \App\Models\Pemasok::query();
+
+    if ($request->filled('search')) {
+        $search = $request->search;
+
+        $query->where(function ($q) use ($search) {
+            $q->where('kodepemasok', 'like', '%' . $search . '%')
+            ->orWhere('namapemasok', 'like', '%' . $search . '%')
+            ->orWhere('alamatpemasok', 'like', '%' . $search . '%');;
+        });
+    }
+
+    $pemasok = $query->paginate(10);
 
         // Generate next kodepemasok misal S-001, S-002 dst
         $lastKode = Pemasok::orderBy('kodepemasok', 'desc')->first()?->kodepemasok;

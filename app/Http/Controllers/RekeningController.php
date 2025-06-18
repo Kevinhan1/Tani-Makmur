@@ -7,9 +7,20 @@ use App\Models\Rekening;
 
 class RekeningController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {   
-        $rekening = Rekening::all();
+        $query = \App\Models\Rekening::query();
+
+    if ($request->filled('search')) {
+        $search = $request->search;
+
+        $query->where(function ($q) use ($search) {
+            $q->where('koderekening', 'like', '%' . $search . '%')
+            ->orWhere('namarekening', 'like', '%' . $search . '%');
+        });
+    }
+
+    $rekening = $query->paginate(10);
 
         // Generate next kode rekening (format R-001, R-002, ...)
         $last = Rekening::orderBy('koderekening', 'desc')->first();

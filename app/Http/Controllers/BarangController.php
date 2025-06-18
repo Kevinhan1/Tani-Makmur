@@ -8,15 +8,27 @@ use Illuminate\Http\Request;
 class BarangController extends Controller
 {
     // Tampilkan halaman data barang + form tambah dengan nextCode
-    public function index()
-    {
-        $barang = Barang::all();
+    public function index(Request $request)
+    {   
+        $query = \App\Models\Barang::query();
+
+    if ($request->filled('search')) {
+        $search = $request->search;
+
+        $query->where(function ($q) use ($search) {
+            $q->where('kodebarang', 'like', '%' . $search . '%')
+            ->orWhere('namabarang', 'like', '%' . $search . '%');
+        });
+    }
+
+    $barang = $query->paginate(10);
 
         $nextCode = $this->getNextKodeBarang();
 
         return view('barang', compact('barang', 'nextCode'));
     }
 
+    
     // Simpan data barang baru
     public function store(Request $request)
     {

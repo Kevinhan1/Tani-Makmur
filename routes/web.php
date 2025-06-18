@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PenggunaController;
-use App\Http\Controllers\AuthController; // Pastikan untuk meng-import AuthController
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\PemasokController;
@@ -13,7 +12,7 @@ use App\Http\Controllers\PindahSaldoController;
 use App\Http\Controllers\MutasiRekeningController;
 use App\Http\Controllers\PenjualanController;
 use App\Http\Controllers\PembelianController;
-
+use App\Http\Controllers\PembayaranPembelianController;
 
 // Halaman utama
 Route::get('/', function () {
@@ -53,6 +52,9 @@ Route::resource('pemasok', PemasokController::class);
 Route::resource('pelanggan', PelangganController::class);
 //Rekening
 Route::resource('rekening', RekeningController::class);
+//Pengguna
+Route::resource('pengguna', PenggunaController::class);
+
 
 
 //Transaksi 
@@ -62,9 +64,15 @@ Route::resource('biaya', BiayaController::class);
 // Pindah Buku
 Route::resource('pindahsaldo', PindahSaldoController::class);
 
-Route::resource('/penjualan', PenjualanController::class);
+// Pembelian
 Route::resource('/pembelian', PembelianController::class);
-Route::get('/pembayaran-pembelian', [BarangController::class, 'index'])->name('pembayaranpembelian.index');
+Route::get('/pembelian/{notabeli}/invoice', [PembelianController::class, 'cetakInvoice']);
+Route::resource('/pembayaran-pembelian', PembayaranPembelianController::class);
+
+
+Route::resource('/penjualan', PenjualanController::class);
+
+
 Route::get('/pembayaran-penjualan', [BarangController::class, 'index'])->name('pembayaranpenjualan.index');
 
 //laporan 

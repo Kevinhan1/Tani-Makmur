@@ -10,36 +10,71 @@ use Illuminate\Support\Carbon;
 class PindahSaldoController extends Controller
 {
     // Tampilkan daftar pindah saldo
-    public function index()
-    {
-        // Ambil data pindah saldo dengan relasi rekening dan pengguna
-        $pindahsaldo = PindahSaldo::with(['rekeningAsal', 'rekeningTujuan', 'pengguna'])
-            ->orderBy('tanggal', 'desc')
-            ->orderBy('nopindahbuku', 'desc')
-            ->get();
+    public function index(Request $request)
+{
+    // Query awal dengan relasi
+    $query = PindahSaldo::with(['rekeningAsal', 'rekeningTujuan', 'pengguna'])
+        ->orderBy('tanggal', 'desc')
+        ->orderBy('nopindahbuku', 'desc');
 
-        // Data rekening untuk dropdown
-        $rekening = Rekening::all();
+    // Pencarian jika ada kata kunci
+    if ($request->filled('search')) {
+        $search = $request->search;
 
-        // Buat kode pindah buku berikutnya berdasarkan tanggal hari ini
-        $nextCode = $this->generateKodePindahSaldo(date('Y-m-d'));
-
-        return view('pindahsaldo', compact('pindahsaldo', 'rekening', 'nextCode'));
+        $query->where(function ($q) use ($search) {
+            $q->where('nopindahbuku', 'like', "%$search%")
+                ->orWhere('tanggal', 'like', "%$search%")
+                ->orWhere('keterangan', 'like', "%$search%")
+                ->orWhere('total', 'like', "%$search%");
+        })
+        ->orWhereHas('rekeningAsal', function ($q) use ($search) {
+            $q->where('namarekening', 'like', "%$search%");
+        })
+        ->orWhereHas('rekeningTujuan', function ($q) use ($search) {
+            $q->where('namarekening', 'like', "%$search%");
+        })
+        ->orWhereHas('pengguna', function ($q) use ($search) {
+            $q->where('namapengguna', 'like', "%$search%");
+        });
     }
+
+    // Data hasil query (pagination)
+    $pindahsaldo = $query->paginate(10)->withQueryString();
+
+    // Data rekening
+    $rekening = Rekening::all();
+
+    // Kode otomatis
+    $nextCode = $this->generateKodePindahSaldo(date('Y-m-d'));
+
+    return view('pindahsaldo', compact('pindahsaldo', 'rekening', 'nextCode'));
+}
 
     // Generate kode pindah buku otomatis sesuai format PB-YYYYMMDD-XXX
     protected function generateKodePindahSaldo($tanggal)
     {
-        $datePart = Carbon::parse($tanggal)->format('Ymd');
+        // Ubah tanggal ke format yyyymmdd
+        $datePart = date('Ymd');
 
-        // Hitung sudah ada berapa data dengan tanggal tersebut
-        $count = PindahSaldo::whereDate('tanggal', $tanggal)->count() + 1;
+        // Ambil entri terakhir hari itu
+        $last = PindahSaldo::where('nopindahbuku', 'like', "PB-{$datePart}-%")
+                    ->orderBy('nopindahbuku', 'desc')
+                    ->first();
 
-        // Format nomor urut 3 digit, misal 001, 002, ...
-        $noUrut = str_pad($count, 3, '0', STR_PAD_LEFT);
+        if (!$last) {
+            $noUrut = 1;
+        } else {
+            // Ambil 3 digit terakhir dari kode terakhir (misal: PB-20250611-002 → 002)
+            $lastNumber = (int) substr($last->nopindahbuku, -3);
+            $noUrut = $lastNumber + 1;
+        }
 
-        return "PB-{$datePart}-{$noUrut}";
+        // Format ke 3 digit
+        $noUrutFormatted = str_pad($noUrut, 3, '0', STR_PAD_LEFT);
+
+        return "PB-{$datePart}-{$noUrutFormatted}";
     }
+
 
     // Simpan data pindah saldo baru
     public function store(Request $request)
@@ -77,57 +112,30 @@ class PindahSaldoController extends Controller
 
     // Update data pindah saldo
     public function update(Request $request, $nopindahbuku)
-    {
-        $request->validate([
-            'tanggal' => 'required|date',
-            'rekeningasal' => 'required|exists:trekening,koderekening',
-            'rekeningtujuan' => 'required|exists:trekening,koderekening|different:rekeningasal',
-            'keterangan' => 'required|string',
-            'total' => 'required|numeric|min:0.01',
-        ]);
+{
+    $request->validate([
+        'tanggal' => 'required|date',
+        'rekeningasal' => 'required|exists:trekening,koderekening',
+        'rekeningtujuan' => 'required|exists:trekening,koderekening|different:rekeningasal',
+        'keterangan' => 'required|string',
+        'total' => 'required|numeric|min:0.01',
+    ]);
 
-        // Cari data pindah saldo lama
-        $pindahSaldo = PindahSaldo::findOrFail($nopindahbuku);
+    // Ambil data pindah saldo yang lama
+    $pindahSaldo = PindahSaldo::findOrFail($nopindahbuku);
 
-        // Ambil data rekening asal & tujuan lama
-        $rekAsalLama = Rekening::where('koderekening', $pindahSaldo->koderekeningasal)->first();
-        $rekTujuanLama = Rekening::where('koderekening', $pindahSaldo->koderekeningtujuan)->first();
+    // Update hanya data, saldo akan ditangani oleh trigger dari tmutasirekening
+    $pindahSaldo->update([
+        'tanggal' => $request->tanggal,
+        'koderekeningasal' => $request->rekeningasal,
+        'koderekeningtujuan' => $request->rekeningtujuan,
+        'keterangan' => $request->keterangan,
+        'total' => $request->total,
+    ]);
 
-        // Ambil data rekening asal & tujuan baru dari input
-        $rekAsalBaru = Rekening::where('koderekening', $request->rekeningasal)->first();
-        $rekTujuanBaru = Rekening::where('koderekening', $request->rekeningtujuan)->first();
+    return redirect()->route('pindahsaldo.index')->with('success', 'Data pindah saldo berhasil diupdate.');
+}
 
-        $totalLama = $pindahSaldo->total;
-        $totalBaru = $request->total;
-
-        // Kembalikan saldo rekening lama ke keadaan sebelum pindah saldo:
-        // rekening asal lama + total lama
-        $rekAsalLama->saldo += $totalLama;
-        $rekAsalLama->save();
-
-        // rekening tujuan lama - total lama
-        $rekTujuanLama->saldo -= $totalLama;
-        $rekTujuanLama->save();
-
-        // Kurangi saldo rekening asal baru dengan total baru
-        $rekAsalBaru->saldo -= $totalBaru;
-        $rekAsalBaru->save();
-
-        // Tambahkan saldo rekening tujuan baru dengan total baru
-        $rekTujuanBaru->saldo += $totalBaru;
-        $rekTujuanBaru->save();
-
-        // Update data pindah saldo
-        $pindahSaldo->update([
-            'tanggal' => $request->tanggal,
-            'koderekeningasal' => $request->rekeningasal,
-            'koderekeningtujuan' => $request->rekeningtujuan,
-            'keterangan' => $request->keterangan,
-            'total' => $totalBaru,
-        ]);
-
-        return redirect()->route('pindahsaldo.index')->with('success', 'Data pindah saldo berhasil diupdate.');
-    }
 
 
     // Hapus satu atau beberapa data pindah saldo

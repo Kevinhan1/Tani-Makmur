@@ -73,6 +73,12 @@
                     Rekening
                 </a>
             </li>
+            <li>
+                <a href="{{ route('pengguna.index') }}" 
+                class="w-full flex items-center justify-between px-2 py-2 hover:bg-gray-100 rounded transition text-black-100">
+                    Pengguna
+                </a>
+            </li>
         </ul>
     </li>
 
@@ -100,19 +106,19 @@
                 </a>
             </li>
             <li>
-                <a href="{{ route('penjualan.index') }}" 
-                class="w-full flex items-center justify-between px-2 py-2 hover:bg-gray-100 rounded transition text-black-100">
-                    Penjualan
-                </a>
-            </li>
-            <li>
                 <a href="{{ route('pembelian.index') }}" 
                 class="w-full flex items-center justify-between px-2 py-2 hover:bg-gray-100 rounded transition text-black-100">
                     Pembelian
                 </a>
             </li>
             <li>
-                <a href="{{ route('pembayaranpembelian.index') }}" 
+                <a href="{{ route('penjualan.index') }}" 
+                class="w-full flex items-center justify-between px-2 py-2 hover:bg-gray-100 rounded transition text-black-100">
+                    Penjualan
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('pembayaran-pembelian.index') }}" 
                 class="w-full flex items-center justify-between px-2 py-2 hover:bg-gray-100 rounded transition text-black-100">
                     Pembayaran Pembelian
                 </a>

@@ -10,14 +10,33 @@ use Illuminate\Support\Facades\Session;
 class BiayaController extends Controller
 {
     // Tampilkan daftar biaya
-    public function index()
-    {
-        $biaya = Biaya::with(['rekening', 'pengguna'])->orderBy('nobiaya', 'desc')->get();
-        $rekening = Rekening::orderBy('namarekening')->get();
-        $nextCode = $this->generateKodeBiaya();
+public function index(Request $request)
+{
+    $query = Biaya::with(['rekening', 'pengguna'])->orderBy('nobiaya', 'desc');
 
-        return view('biaya', compact('biaya', 'rekening', 'nextCode'));
+    if ($request->filled('search')) {
+        $search = $request->search;
+
+        $query->where(function ($q) use ($search) {
+            $q->where('nobiaya', 'like', "%$search%")
+                ->orWhere('tanggal', 'like', "%$search%")
+                ->orWhere('keterangan', 'like', "%$search%")
+                ->orWhere('total', 'like', "%$search%");
+            })
+        ->orWhereHas('rekening', function ($q) use ($search) {
+            $q->where('namarekening', 'like', "%$search%");
+        })
+        ->orWhereHas('pengguna', function ($q) use ($search) {
+            $q->where('namapengguna', 'like', "%$search%");
+        });
     }
+
+    $biaya = $query->paginate(10)->withQueryString(); // ← tetap bawa keyword saat pindah halaman
+    $rekening = Rekening::orderBy('namarekening')->get();
+    $nextCode = $this->generateKodeBiaya();
+
+    return view('biaya', compact('biaya', 'rekening', 'nextCode'));
+}
 
     // Generate nobiaya otomatis: BY-yyyymmdd-001 (pakai tanda - bukan /)
     private function generateKodeBiaya()

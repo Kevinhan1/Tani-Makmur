@@ -7,9 +7,29 @@ use App\Models\Pelanggan;
 
 class PelangganController extends Controller
 {
-    public function index()
-    {
-        $pelanggan = Pelanggan::all();
+    public function index(Request $request)
+    {   
+        $query = \App\Models\Pelanggan::query();
+
+    if ($request->filled('search')) {
+        $search = $request->search;
+
+        $query->where(function ($q) use ($search) {
+            $q->where('kodepelanggan', 'like', '%' . $search . '%')
+            ->orWhere('namapelanggan', 'like', '%' . $search . '%')
+            ->orWhere('namakios', 'like', '%' . $search . '%')
+            ->orWhere('alamat', 'like', '%' . $search . '%')
+            ->orWhere('kelurahan', 'like', '%' . $search . '%')
+            ->orWhere('kecamatan', 'like', '%' . $search . '%')
+            ->orWhere('kota', 'like', '%' . $search . '%')
+            ->orWhere('ktp', 'like', '%' . $search . '%')
+            ->orWhere('npwp', 'like', '%' . $search . '%')
+            ->orWhere('nitku', 'like', '%' . $search . '%')
+            ;
+        });
+    }
+
+    $pelanggan = $query->paginate(10);
 
         // Generate kode otomatis
         $last = Pelanggan::orderBy('kodepelanggan', 'desc')->first();
