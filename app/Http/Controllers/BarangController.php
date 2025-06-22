@@ -4,12 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Models\Barang;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 
 class BarangController extends Controller
 {
     // Tampilkan halaman data barang + form tambah dengan nextCode
     public function index(Request $request)
     {   
+        $user = Session::get('user');
+
+        if (!$user || $user->status !== 'admin') {
+        abort(403, 'Anda tidak memiliki akses ke halaman ini.');
+    }
         $query = \App\Models\Barang::query();
 
     if ($request->filled('search')) {
@@ -21,7 +27,7 @@ class BarangController extends Controller
         });
     }
 
-    $barang = $query->paginate(10);
+    $barang = $query->paginate(15);
 
         $nextCode = $this->getNextKodeBarang();
 

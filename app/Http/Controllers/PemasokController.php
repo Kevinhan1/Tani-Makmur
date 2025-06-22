@@ -4,12 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Models\Pemasok;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 
 class PemasokController extends Controller
 {
     // Menampilkan halaman dan data pemasok
     public function index(Request $request)
     {   
+                $user = Session::get('user');
+
+        if (!$user || $user->status !== 'admin') {
+        abort(403, 'Anda tidak memiliki akses ke halaman ini.');
+    }
+    
         $query = \App\Models\Pemasok::query();
 
     if ($request->filled('search')) {
@@ -22,7 +29,7 @@ class PemasokController extends Controller
         });
     }
 
-    $pemasok = $query->paginate(10);
+    $pemasok = $query->paginate(15);
 
         // Generate next kodepemasok misal S-001, S-002 dst
         $lastKode = Pemasok::orderBy('kodepemasok', 'desc')->first()?->kodepemasok;

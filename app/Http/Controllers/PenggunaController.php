@@ -5,11 +5,17 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Pengguna;
 use Illuminate\Support\Facades\Hash;
-
+use Illuminate\Support\Facades\Session;
 class PenggunaController extends Controller
 {
     public function index(Request $request)
-    {
+    {   
+
+        $user = Session::get('user');
+
+        if (!$user || $user->status !== 'admin') {
+        abort(403, 'Anda tidak memiliki akses ke halaman ini.');
+    }
         $query = Pengguna::query();
 
         if ($request->has('search')) {
@@ -27,7 +33,7 @@ class PenggunaController extends Controller
         $validated = $request->validate([
             'namapengguna' => 'required',
             'katakunci' => 'required|min:4',
-            'status' => 'required|in:admin,user',
+            'status' => 'required|in:admin,user,developer',
         ]);
 
         $validated['kodepengguna'] = $this->getNextKodePengguna(); // generate otomatis
@@ -46,7 +52,7 @@ class PenggunaController extends Controller
 
         $request->validate([
             'namapengguna' => 'required|unique:tpengguna,namapengguna,' . $pengguna->kodepengguna . ',kodepengguna',
-            'status' => 'required|in:admin,user',
+            'status' => 'required|in:admin,user,developer',
         ]);
 
         $data = [

@@ -4,7 +4,7 @@
 @section('page', 'Pengguna')
 
 @section('content')
-<div class="bg-white p-6 rounded shadow" style="min-height: 600px;">
+<div class="bg-white p-6 rounded shadow" style="min-height: 800px;">
   <div class="flex justify-between items-center mb-6">
     <h2 class="text-2xl font-semibold">Data Pengguna</h2>
     <div id="actionButtons">

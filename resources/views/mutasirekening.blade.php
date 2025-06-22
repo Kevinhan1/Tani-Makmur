@@ -90,8 +90,4 @@
         </tbody>
     </table>
 </div>
-    <div class="mt-4">
-        {{ $mutasi->links() }}
-    </div>
-</div>
 @endsection

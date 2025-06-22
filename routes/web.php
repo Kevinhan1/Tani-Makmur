@@ -1,18 +1,19 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PenggunaController;
+
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\PemasokController;
 use App\Http\Controllers\PelangganController;
 use App\Http\Controllers\RekeningController;
+use App\Http\Controllers\PenggunaController;
 use App\Http\Controllers\BiayaController;
 use App\Http\Controllers\PindahSaldoController;
-use App\Http\Controllers\MutasiRekeningController;
-use App\Http\Controllers\PenjualanController;
 use App\Http\Controllers\PembelianController;
+use App\Http\Controllers\PenjualanController;
 use App\Http\Controllers\PembayaranPembelianController;
+use App\Http\Controllers\MutasiRekeningController;
 
 // Halaman utama
 Route::get('/', function () {
@@ -43,15 +44,22 @@ Route::get('dashboard', function () {
 
 //Master
 //Barang
+
 Route::resource('barang', BarangController::class);
+
 
 //Pemasok
 Route::resource('pemasok', PemasokController::class);
 
+
 //Pelanggan
 Route::resource('pelanggan', PelangganController::class);
+
+
 //Rekening
 Route::resource('rekening', RekeningController::class);
+
+
 //Pengguna
 Route::resource('pengguna', PenggunaController::class);
 
@@ -61,19 +69,30 @@ Route::resource('pengguna', PenggunaController::class);
 // Biaya
 Route::resource('biaya', BiayaController::class);
 
+
 // Pindah Buku
 Route::resource('pindahsaldo', PindahSaldoController::class);
+
 
 // Pembelian
 Route::resource('/pembelian', PembelianController::class);
 Route::get('/pembelian/{notabeli}/invoice', [PembelianController::class, 'cetakInvoice']);
+
+// Pembayaran Pembelian 
 Route::resource('/pembayaran-pembelian', PembayaranPembelianController::class);
+Route::get('/pembayaran-pembelian/history/{notabeli}', [PembayaranPembelianController::class, 'getHistory']);
+Route::get('/pembayaran-pembelian/data/{no}', [PembayaranPembelianController::class, 'show']);
+Route::get('/pembayaran-pembelian/data/{no}', [PembayaranPembelianController::class, 'getData']);
+Route::put('/pembayaran-pembelian/{no}', [PembayaranPembelianController::class, 'update'])->name('pembayaran-pembelian.update');
+Route::delete('/pembayaran-pembelian/{no}', [PembayaranPembelianController::class, 'destroy'])->name('pembayaran-pembelian.destroy');
 
 
+// Penjualan
 Route::resource('/penjualan', PenjualanController::class);
-
-
+Route::get('/penjualan/{notajual}/invoice', [PenjualanController::class, 'cetakInvoice'])->name('penjualan.invoice');
+// Pembayaran Penjualan
 Route::get('/pembayaran-penjualan', [BarangController::class, 'index'])->name('pembayaranpenjualan.index');
+
 
 //laporan 
 //Mutasi Rekening

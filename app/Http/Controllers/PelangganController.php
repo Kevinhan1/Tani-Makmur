@@ -1,14 +1,18 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use Illuminate\Http\Request;
 use App\Models\Pelanggan;
-
+use Illuminate\Support\Facades\Session;
 class PelangganController extends Controller
 {
     public function index(Request $request)
     {   
+        $user = Session::get('user');
+
+        if (!$user || $user->status !== 'admin') {
+        abort(403, 'Anda tidak memiliki akses ke halaman ini.');
+    }
         $query = \App\Models\Pelanggan::query();
 
     if ($request->filled('search')) {
@@ -29,7 +33,7 @@ class PelangganController extends Controller
         });
     }
 
-    $pelanggan = $query->paginate(10);
+    $pelanggan = $query->paginate(15);
 
         // Generate kode otomatis
         $last = Pelanggan::orderBy('kodepelanggan', 'desc')->first();

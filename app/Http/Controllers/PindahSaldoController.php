@@ -11,44 +11,44 @@ class PindahSaldoController extends Controller
 {
     // Tampilkan daftar pindah saldo
     public function index(Request $request)
-{
-    // Query awal dengan relasi
-    $query = PindahSaldo::with(['rekeningAsal', 'rekeningTujuan', 'pengguna'])
-        ->orderBy('tanggal', 'desc')
-        ->orderBy('nopindahbuku', 'desc');
+        {
+            $query = PindahSaldo::with(['rekeningAsal', 'rekeningTujuan', 'pengguna'])
+                ->orderBy('tanggal', 'desc')
+                ->orderBy('nopindahbuku', 'desc');
 
-    // Pencarian jika ada kata kunci
-    if ($request->filled('search')) {
-        $search = $request->search;
+            // Filter berdasarkan tanggal jika dipilih
+            if ($request->filled('tanggal_awal') && $request->filled('tanggal_akhir')) {
+                $query->whereBetween('tanggal', [$request->tanggal_awal, $request->tanggal_akhir]);
+            } else {
+                // Jika tidak pilih tanggal, tampilkan kosong
+                return view('pindahsaldo', [
+                    'pindahsaldo' => collect(),
+                    'rekening' => Rekening::all(),
+                    'nextCode' => $this->generateKodePindahSaldo(date('Y-m-d'))
+                ]);
+            }
 
-        $query->where(function ($q) use ($search) {
-            $q->where('nopindahbuku', 'like', "%$search%")
-                ->orWhere('tanggal', 'like', "%$search%")
-                ->orWhere('keterangan', 'like', "%$search%")
-                ->orWhere('total', 'like', "%$search%");
-        })
-        ->orWhereHas('rekeningAsal', function ($q) use ($search) {
-            $q->where('namarekening', 'like', "%$search%");
-        })
-        ->orWhereHas('rekeningTujuan', function ($q) use ($search) {
-            $q->where('namarekening', 'like', "%$search%");
-        })
-        ->orWhereHas('pengguna', function ($q) use ($search) {
-            $q->where('namapengguna', 'like', "%$search%");
-        });
-    }
+            // Filter pencarian jika ada
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('nopindahbuku', 'like', "%$search%")
+                        ->orWhere('tanggal', 'like', "%$search%")
+                        ->orWhere('keterangan', 'like', "%$search%")
+                        ->orWhere('total', 'like', "%$search%");
+                })
+                ->orWhereHas('rekeningAsal', fn($q) => $q->where('namarekening', 'like', "%$search%"))
+                ->orWhereHas('rekeningTujuan', fn($q) => $q->where('namarekening', 'like', "%$search%"))
+                ->orWhereHas('pengguna', fn($q) => $q->where('namapengguna', 'like', "%$search%"));
+            }
 
-    // Data hasil query (pagination)
-    $pindahsaldo = $query->paginate(10)->withQueryString();
+            $pindahsaldo = $query->paginate(15)->withQueryString();
+            $rekening = Rekening::all();
+            $nextCode = $this->generateKodePindahSaldo(date('Y-m-d'));
 
-    // Data rekening
-    $rekening = Rekening::all();
+            return view('pindahsaldo', compact('pindahsaldo', 'rekening', 'nextCode'));
+        }
 
-    // Kode otomatis
-    $nextCode = $this->generateKodePindahSaldo(date('Y-m-d'));
-
-    return view('pindahsaldo', compact('pindahsaldo', 'rekening', 'nextCode'));
-}
 
     // Generate kode pindah buku otomatis sesuai format PB-YYYYMMDD-XXX
     protected function generateKodePindahSaldo($tanggal)
@@ -87,14 +87,24 @@ class PindahSaldoController extends Controller
             'total' => 'required|numeric|min:0.01',
         ]);
 
+        // Ambil data rekening asal
+        $rekeningAsal = Rekening::where('koderekening', $request->rekeningasal)->first();
+
+        if (!$rekeningAsal) {
+            return back()->withErrors(['rekeningasal' => 'Rekening asal tidak ditemukan.'])->withInput();
+        }
+
+        // Cek apakah saldo mencukupi
+        if ($request->total > $rekeningAsal->saldo) {
+            return back()->withErrors(['total' => 'Saldo tidak cukup untuk melakukan pindah saldo.'])->withInput();
+        }
+
         $user = session('user');
         if (!$user) {
             return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu.');
         }
 
         $kodepengguna = $user->kodepengguna;
-
-        // Buat kode nomor pindah saldo
         $nopindahbuku = $this->generateKodePindahSaldo($request->tanggal);
 
         PindahSaldo::create([
@@ -109,6 +119,8 @@ class PindahSaldoController extends Controller
 
         return redirect()->route('pindahsaldo.index')->with('success', 'Data berhasil disimpan');
     }
+
+
 
     // Update data pindah saldo
     public function update(Request $request, $nopindahbuku)

@@ -4,11 +4,18 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Rekening;
+use Illuminate\Support\Facades\Session;
 
 class RekeningController extends Controller
 {
     public function index(Request $request)
     {   
+
+                $user = Session::get('user');
+
+        if (!$user || $user->status !== 'admin') {
+        abort(403, 'Anda tidak memiliki akses ke halaman ini.');
+    }
         $query = \App\Models\Rekening::query();
 
     if ($request->filled('search')) {
@@ -20,7 +27,7 @@ class RekeningController extends Controller
         });
     }
 
-    $rekening = $query->paginate(10);
+    $rekening = $query->paginate(15);
 
         // Generate next kode rekening (format R-001, R-002, ...)
         $last = Rekening::orderBy('koderekening', 'desc')->first();

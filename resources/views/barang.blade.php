@@ -4,7 +4,7 @@
 @section('page', 'Barang')
 
 @section('content')
-<div class="bg-white p-6 rounded shadow" style="min-height: 600px;">
+<div class="bg-white p-6 rounded shadow" style="min-height: 800px;">
     <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-semibold">Data Barang</h2>
 
@@ -74,9 +74,9 @@
                     <th class="px-4 py-2 w-8 font-normal" ></th> <!-- Kolom kosong untuk checkbox -->
                     <th class="px-4 py-2 font-normal">Kode Barang</th>
                     <th class="px-4 py-2 font-normal">Nama Barang</th>
-                    <th class="px-4 py-2 font-normal">Harga Beli / pcs</th>
-                    <th class="px-4 py-2 font-normal">Harga Jual / pcs</th>
-                    <th class="px-4 py-2 font-normal">1 pcs / kg</th>
+                    <th class="px-4 py-2 font-normal">Harga Beli / zak</th>
+                    <th class="px-4 py-2 font-normal">Harga Jual / zak</th>
+                    <th class="px-4 py-2 font-normal">1 zak / kg</th>
                 </tr>
             </thead>
             <tbody>

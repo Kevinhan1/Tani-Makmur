@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class dbayarbeli extends Model
+class Dbayarbeli extends Model // D besar!
 {
     protected $table = 'tdbayarbeli';
     protected $primaryKey = 'no';
@@ -17,11 +17,11 @@ class dbayarbeli extends Model
 
     public function rekening()
     {
-        return $this->belongsTo(rekening::class, 'koderekening', 'koderekening');
+        return $this->belongsTo(Rekening::class, 'koderekening', 'koderekening');
     }
 
     public function nota()
     {
-        return $this->belongsTo(hbeli::class, 'notabeli', 'notabeli');
+        return $this->belongsTo(Hbeli::class, 'notabeli', 'notabeli');
     }
 }

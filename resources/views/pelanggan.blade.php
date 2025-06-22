@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 
-<div class="bg-white p-6 rounded shadow" style="min-height: 600px;">
+<div class="bg-white p-6 rounded shadow" style="min-height: 800px;">
     <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-semibold">Data Pelanggan</h2>
         

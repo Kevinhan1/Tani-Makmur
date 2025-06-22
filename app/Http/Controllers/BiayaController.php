@@ -14,15 +14,27 @@ public function index(Request $request)
 {
     $query = Biaya::with(['rekening', 'pengguna'])->orderBy('nobiaya', 'desc');
 
+    // Filter berdasarkan tanggal jika diisi
+    if ($request->filled('tanggal_awal') && $request->filled('tanggal_akhir')) {
+        $query->whereBetween('tanggal', [$request->tanggal_awal, $request->tanggal_akhir]);
+    } else {
+        // Jika tidak memilih tanggal, return view kosong
+        return view('biaya', [
+            'biaya' => collect(), // Kosongkan data biaya
+            'rekening' => Rekening::orderBy('namarekening')->get(),
+            'nextCode' => $this->generateKodeBiaya()
+        ]);
+    }
+
+    // Filter pencarian jika ada
     if ($request->filled('search')) {
         $search = $request->search;
-
         $query->where(function ($q) use ($search) {
             $q->where('nobiaya', 'like', "%$search%")
-                ->orWhere('tanggal', 'like', "%$search%")
-                ->orWhere('keterangan', 'like', "%$search%")
-                ->orWhere('total', 'like', "%$search%");
-            })
+            ->orWhere('tanggal', 'like', "%$search%")
+            ->orWhere('keterangan', 'like', "%$search%")
+            ->orWhere('total', 'like', "%$search%");
+        })
         ->orWhereHas('rekening', function ($q) use ($search) {
             $q->where('namarekening', 'like', "%$search%");
         })
@@ -31,12 +43,13 @@ public function index(Request $request)
         });
     }
 
-    $biaya = $query->paginate(10)->withQueryString(); // ← tetap bawa keyword saat pindah halaman
+    $biaya = $query->paginate(15)->withQueryString();
     $rekening = Rekening::orderBy('namarekening')->get();
     $nextCode = $this->generateKodeBiaya();
 
     return view('biaya', compact('biaya', 'rekening', 'nextCode'));
 }
+
 
     // Generate nobiaya otomatis: BY-yyyymmdd-001 (pakai tanda - bukan /)
     private function generateKodeBiaya()
@@ -78,6 +91,14 @@ public function index(Request $request)
         $data['kodepengguna'] = $user->kodepengguna;
 
         Biaya::create($data);
+        $rekening = Rekening::where('koderekening', $request->koderekening)->first();
+
+
+        if ($rekening && $request->total > $rekening->saldo) {
+            return back()
+                ->withInput()
+                ->withErrors(['total' => 'Saldo rekening tidak cukup untuk melakukan transaksi.']);
+        }
 
         return redirect()->route('biaya.index')->with('success', 'Data biaya berhasil disimpan.');
     }

@@ -4,83 +4,126 @@
 @section('page', 'Biaya')
 
 @section('content')
-<div class="bg-white p-6 rounded shadow" style="min-height: 600px;">
+<div class="bg-white p-6 rounded shadow" style="min-height: 800px;">
     <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-semibold">Data Biaya</h2>
-        <form method="GET" action="{{ route('biaya.index') }}" class="relative ml-20">
-            <input type="text" name="search" placeholder="Cari Data"
-                value="{{ request('search') }}"
-                class="border rounded px-4 py-2 bg-gray-100 text-sm focus:outline-none w-80 text-left" />
-            <button type="submit" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500">
-                <img src="{{ asset('icons\search-normal.svg') }}" alt="search" class="w-5 h-5" />
-            </button>
-        </form>
+        {{-- KIRI: Judul dan Filter --}}
+        <div class="flex items-end gap-6">
+            <div>
+                <h2 class="text-2xl font-semibold mb-1">Data Biaya</h2>
+            </div>
 
-        
+            {{-- FORM FILTER --}}
+            <form method="GET" action="{{ route('biaya.index') }}" class="flex items-end space-x-4">
+
+                <div class="flex flex-col">
+                    <label for="tanggal_awal" class="text-sm text-gray-600 mb-1">Tanggal Awal</label>
+                    <input type="date" name="tanggal_awal" id="tanggal_awal"
+                        value="{{ request('tanggal_awal') }}"
+                        class="border rounded px-3 py-2 bg-gray-100 text-sm focus:outline-none" required>
+                </div>
+
+                <div class="flex flex-col">
+                    <label for="tanggal_akhir" class="text-sm text-gray-600 mb-1">Tanggal Akhir</label>
+                    <input type="date" name="tanggal_akhir" id="tanggal_akhir"
+                        value="{{ request('tanggal_akhir') }}"
+                        class="border rounded px-3 py-2 bg-gray-100 text-sm focus:outline-none" required>
+                </div>
+
+                <div>
+                    <button type="submit"
+                        class="mt-5 bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500">
+                        Tampilkan
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        {{-- KANAN: Tombol Tambah --}}
         <div id="actionButtons">
-            <button onclick="openModalForAdd()" class="bg-[#89E355] text-white px-4 py-2 rounded hover:bg-[#7ED242]">
+            <button type="button" onclick="openModalForAdd()"
+                class="bg-[#89E355] text-white px-4 py-2 rounded hover:bg-[#7ED242]">
                 Tambah +
             </button>
         </div>
+    </div>
 
-            <div class="flex items-center mr-5 gap-0 space-x-2 text-sm text-gray-700">
-            <!-- Label Halaman -->
+
+    {{-- PAGINATION INFO DAN KONTROL --}}
+    @if ($biaya instanceof \Illuminate\Pagination\LengthAwarePaginator && $biaya->count())
+        <div class="flex justify-end items-center mb-3 text-sm text-gray-700 space-x-2">
             <span>
                 Halaman {{ $biaya->currentPage() }} dari {{ $biaya->lastPage() }}
             </span>
 
-                <!-- Panah Kiri -->
+            {{-- Panah kiri --}}
             @if ($biaya->onFirstPage())
-                <span class="px-2 py-1 border border-gray-400 text-gray-400 rounded font-bold cursor-not-allowed">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <span class="px-2 py-1 border border-gray-400 text-gray-400 rounded cursor-not-allowed font-bold">
+                    <svg class="w-4 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
                     </svg>
                 </span>
             @else
                 <a href="{{ request()->fullUrlWithQuery(['page' => $biaya->currentPage() - 1]) }}"
-                    class="px-2 py-1 border border-gray-700 text-gray-800 rounded hover:bg-gray-100 font-bold">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                class="px-2 py-1 border border-gray-700 text-gray-800 rounded hover:bg-gray-100 font-bold">
+                    <svg class="w-4 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
                     </svg>
                 </a>
             @endif
 
-            <!-- Panah Kanan -->
+            {{-- Panah kanan --}}
             @if ($biaya->hasMorePages())
                 <a href="{{ request()->fullUrlWithQuery(['page' => $biaya->currentPage() + 1]) }}"
-                    class="px-2 py-1 border border-gray-700 text-gray-800 rounded hover:bg-gray-100 font-bold">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                class="px-2 py-1 border border-gray-700 text-gray-800 rounded hover:bg-gray-100 font-bold">
+                    <svg class="w-4 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
                     </svg>
                 </a>
             @else
-                <span class="px-2 py-1 border border-gray-400 text-gray-400 rounded font-bold cursor-not-allowed">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <span class="px-2 py-1 border border-gray-400 text-gray-400 rounded cursor-not-allowed font-bold">
+                    <svg class="w-4 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
                     </svg>
                 </span>
             @endif
         </div>
-    </div>
+    @endif
+
+
 
     <form id="formBiaya">
-        <table class="w-full text-left border-collapse">
-            <thead>
-                <tr class="text-gray-500">
-                    <th class="px-4 py-2 w-8 font-normal"></th>
-                    <th class="px-4 py-2 font-normal">No Biaya</th>
-                    <th class="px-4 py-2 font-normal">Tanggal</th>
-                    <th class="px-4 py-2 font-normal">Rekening</th> <!-- Tambah kolom ini -->
-                    <th class="px-4 py-2 font-normal">Keterangan</th>
-                    <th class="px-4 py-2 font-normal text-left">Total</th>
-                    <th class="px-4 py-2 font-normal">Pengguna</th>
+    <table class="w-full text-left border-collapse">
+        <thead>
+            <tr class="text-gray-500">
+                <th class="px-4 py-2 w-8 font-normal"></th>
+                <th class="px-4 py-2 font-normal">No Biaya</th>
+                <th class="px-4 py-2 font-normal">Tanggal</th>
+                <th class="px-4 py-2 font-normal">Rekening</th>
+                <th class="px-4 py-2 font-normal">Keterangan</th>
+                <th class="px-4 py-2 font-normal text-left">Total</th>
+                <th class="px-4 py-2 font-normal">Pengguna</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!request('tanggal_awal') || !request('tanggal_akhir'))
+                <tr>
+                    <td colspan="7" class="text-center text-gray-500 py-4">
+                        Silakan pilih rentang tanggal untuk menampilkan data.
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
+            @elseif ($biaya->isEmpty())
+                <tr>
+                    <td colspan="7" class="text-center text-gray-500 py-4">
+                        Tidak ada data ditemukan untuk rentang tanggal tersebut.
+                    </td>
+                </tr>
+            @else
                 @foreach ($biaya as $item)
                     <tr class="border-t">
                         <td class="px-4 py-2 text-center">
-                            <input type="checkbox" class="item-checkbox cursor-pointer accent-gray-400" value="{{ $item->nobiaya }}" onchange="updateActionButtons()" style="width:14px; height:14px;">
+                            <input type="checkbox" class="item-checkbox cursor-pointer accent-gray-400"
+                                value="{{ $item->nobiaya }}" onchange="updateActionButtons()"
+                                style="width:14px; height:14px;">
                         </td>
                         <td class="px-4 py-2">{{ $item->nobiaya }}</td>
                         <td class="px-4 py-2">{{ \Carbon\Carbon::parse($item->tanggal)->format('d-m-Y') }}</td>
@@ -90,10 +133,11 @@
                         <td class="px-4 py-2">{{ $item->pengguna->namapengguna ?? '-' }}</td>
                     </tr>
                 @endforeach
-            </tbody>
-        </table>
-    </form>
-</div>
+            @endif
+        </tbody>
+    </table>
+</form>
+
 
 <!-- Modal Form Tambah/Edit -->
 <div id="modalForm" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden z-50">
@@ -132,8 +176,16 @@
             <div class="mb-4">
                 <label for="total" class="block text-sm font-medium">Total</label>
                 <input type="number" step="0.01" name="total" id="total" class="w-full border rounded px-3 py-2 text-left" required>
+                @error('total')
+                    <div class="text-red-600 text-sm mt-1 bg-white p-2 rounded shadow">{{ $message }}</div>
+                    <script>
+                        // Otomatis buka modal jika ada error
+                        window.addEventListener('DOMContentLoaded', () => {
+                            toggleModal();
+                        });
+                    </script>
+                @enderror
             </div>
-
             <div class="flex justify-end space-x-2">
                 <button type="submit" id="submitBtn" class="px-4 py-2 bg-[#89E355] text-white rounded hover:bg-[#7ED242]">Simpan</button>
                 <button type="button" onclick="toggleModal()" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Batal</button>

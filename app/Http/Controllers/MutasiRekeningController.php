@@ -30,7 +30,7 @@ class MutasiRekeningController extends Controller
     }
 
     // Ambil hasil paginasi
-    $mutasi = $query->paginate(20)->withQueryString();
+    $mutasi = $query->paginate(15)->withQueryString();
 
         // Kirim ke view
         return view('mutasirekening', compact('mutasi'));

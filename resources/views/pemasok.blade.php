@@ -4,7 +4,7 @@
 @section('page', 'Pemasok')
 
 @section('content')
-<div class="bg-white p-6 rounded shadow" style="min-height: 600px;">
+<div class="bg-white p-6 rounded shadow" style="min-height: 800px;">
     <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-semibold">Data Pemasok</h2>
 
@@ -25,44 +25,44 @@
         </div>
 
         <div class="flex items-center space-x-2 text-sm text-gray-700">
-          <!-- Label Halaman -->
-          <span>
-              Halaman {{ $pemasok->currentPage() }} dari {{ $pemasok->lastPage() }}
-          </span>
+            <!-- Label Halaman -->
+            <span>
+                Halaman {{ $pemasok->currentPage() }} dari {{ $pemasok->lastPage() }}
+            </span>
 
-              <!-- Panah Kiri -->
-          @if ($pemasok->onFirstPage())
-              <span class="px-2 py-1 border border-gray-400 text-gray-400 rounded font-bold cursor-not-allowed">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
-                  </svg>
-              </span>
-          @else
-              <a href="{{ request()->fullUrlWithQuery(['page' => $pemasok->currentPage() - 1]) }}"
-                class="px-2 py-1 border border-gray-700 text-gray-800 rounded hover:bg-gray-100 font-bold">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
-                  </svg>
-              </a>
-          @endif
+                <!-- Panah Kiri -->
+            @if ($pemasok->onFirstPage())
+                <span class="px-2 py-1 border border-gray-400 text-gray-400 rounded font-bold cursor-not-allowed">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </span>
+            @else
+                <a href="{{ request()->fullUrlWithQuery(['page' => $pemasok->currentPage() - 1]) }}"
+                    class="px-2 py-1 border border-gray-700 text-gray-800 rounded hover:bg-gray-100 font-bold">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </a>
+            @endif
 
-          <!-- Panah Kanan -->
-          @if ($pemasok->hasMorePages())
-              <a href="{{ request()->fullUrlWithQuery(['page' => $pemasok->currentPage() + 1]) }}"
-                class="px-2 py-1 border border-gray-700 text-gray-800 rounded hover:bg-gray-100 font-bold">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
-                  </svg>
-              </a>
-          @else
-              <span class="px-2 py-1 border border-gray-400 text-gray-400 rounded font-bold cursor-not-allowed">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
-                  </svg>
-              </span>
-          @endif
-      </div>
-  </div>
+            <!-- Panah Kanan -->
+            @if ($pemasok->hasMorePages())
+                <a href="{{ request()->fullUrlWithQuery(['page' => $pemasok->currentPage() + 1]) }}"
+                    class="px-2 py-1 border border-gray-700 text-gray-800 rounded hover:bg-gray-100 font-bold">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
+                    </svg>
+                </a>
+            @else
+                <span class="px-2 py-1 border border-gray-400 text-gray-400 rounded font-bold cursor-not-allowed">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
+                    </svg>
+                </span>
+            @endif
+        </div>
+    </div>
 
     <form id="formPemasok">
         <table class="w-full text-left border-collapse">

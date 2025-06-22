@@ -4,7 +4,7 @@
 @section('page', 'Rekening')
 
 @section('content')
-<div class="bg-white p-6 rounded shadow" style="min-height: 600px;">
+<div class="bg-white p-6 rounded shadow" style="min-height: 800px;">
     <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-semibold">Data Rekening</h2>
         <form method="GET" action="{{ route('rekening.index') }}" class="relative ml-20">
@@ -81,7 +81,7 @@
                         </td>
                         <td class="px-4 py-2">{{ $item->koderekening }}</td>
                         <td class="px-4 py-2">{{ $item->namarekening }}</td>
-                        <td class="px-4 py-2">Rp{{ number_format($item->saldo, 0, ',', '.') }}</td>
+                        <td class="px-4 py-2">Rp {{ number_format($item->saldo, 0, ',', '.') }}</td>
                     </tr>
                 @endforeach
             </tbody>

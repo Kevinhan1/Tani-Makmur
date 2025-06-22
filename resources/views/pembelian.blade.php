@@ -17,30 +17,42 @@
         </div>
     </div>
     <!-- Form Header -->
-    <form id="form-utama" class="grid grid-cols-1 md:grid-cols-3 mb-1 gap-1" autocomplete="off">
-        <input type="text" name="notabeli" id="notabeli" value="{{ $notabeli }}" placeholder="No Nota Beli" class="w-[200px] border rounded px-1 py-2 text-sm" required readonly />
-        <input type="date" name="tanggal" id="tanggal" class="w-[200px] border rounded px-1 py-2 text-sm" value="{{ date('Y-m-d') }}" required />
-        <select name="kodepemasok" id="kodepemasok" class="w-[300px] border rounded px-1 py-2 text-sm" required>
-            <option value="">-- Pilih Pemasok --</option>
+    <form id="form-utama" class="grid grid-cols-1 md:grid-cols-5 gap-4" autocomplete="off">
+    <div>
+        <input type="text" name="notabeli" id="notabeli" value="{{ $notabeli }}"
+            placeholder="No Nota Beli"
+            class="w-full border rounded px-2 py-3 text-sm" required readonly />
+    </div>
+    <div>
+        <input type="date" name="tanggal" id="tanggal"
+            class="w-full border rounded px-2 py-3 text-sm"
+            value="{{ date('Y-m-d') }}" required />
+    </div>
+    <div>
+        <select name="kodepemasok" id="kodepemasok"
+            class="w-full border rounded px-2 py-2 text-sm" required>
+            <option value="" selected hidden>Pilih Pemasok</option>
             @foreach ($pemasok as $p)
                 <option value="{{ $p->kodepemasok }}">{{ $p->namapemasok }}</option>
             @endforeach
         </select>
-    </form>
+    </div>
+</form>
+
 
     <!-- Tabel Barang -->
     <form id="formBarang">
         <table class="w-full text-left border-collapse mt-6 text-xs">
             <thead>
                 <tr class="text-gray-500 border-b">
-                    <th class="px-4 py-2 w-8 font-normal"></th>
-                    <th class="px-4 py-2 font-normal">No Ref</th>
-                    <th class="px-4 py-2 font-normal">Nama Barang</th>
-                    <th class="px-4 py-2 font-normal ">No DO</th>
-                    <th class="px-4 py-2 font-normal text-center">Qty</th>
-                    <th class="px-4 py-2 font-normal text-center">Qty Jual</th>
-                    <th class="px-4 py-2 font-normal text-right">Harga Beli</th>
-                    <th class="px-4 py-2 font-normal text-right">Subtotal</th>
+                    <th class="px-5 py-3 w-8 font-normal"></th>
+                    <th class="px-5 py-3 font-normal">No Ref</th>
+                    <th class="px-4 py-3 font-normal">Nama Barang</th>
+                    <th class="px-4 py-3 font-normal ">No DO</th>
+                    <th class="px-4 py-3 font-normal text-center">Kuantitas</th>
+                    <th class="px-4 py-3 font-normal text-center">Kuantitas (Ton)</th>
+                    <th class="px-4 py-3 font-normal text-right">Harga Beli</th>
+                    <th class="px-4 py-3 font-normal text-right">Subtotal</th>
                 </tr>
             </thead>
             <tbody id="tabel-barang"></tbody>
@@ -63,11 +75,16 @@
             <input type="text" id="noref" class="w-full border rounded px-3 py-2" placeholder="No Ref"/>
         </div>
         <div class="mb-4">
-            <label for="kodebarang" class="block text-sm font-medium">Kode - Nama Barang</label>
+            <label for="kodebarang" class="block text-sm font-medium">Nama Barang</label>
             <select id="kodebarang" class="w-full border rounded px-3 py-2" required>
-                <option value="">-- Pilih Barang --</option>
+                <option value="" selected hidden>Pilih Barang</option>
                 @foreach ($barang as $b)
-                    <option value="{{ $b->kodebarang }}" data-hargabeli="{{ $b->hbeli ?? 0 }}">{{ $b->namabarang }}</option>
+                    <option 
+                        value="{{ $b->kodebarang }}" 
+                        data-hargabeli="{{ $b->hbeli ?? 0 }}" 
+                        data-konversi="{{ $b->konversi ?? 0 }}">
+                        {{ $b->namabarang }}
+                    </option>
                 @endforeach
             </select>
         </div>
@@ -76,19 +93,15 @@
             <input type="text" id="nodo" class="w-full border rounded px-3 py-2" placeholder="No DO" />
         </div>
         <div class="mb-4">
-            <label for="qty" class="block text-sm font-medium">Qty</label>
+            <label for="qty" class="block text-sm font-medium">Kuantitas</label>
             <input type="number" id="qty" min="1" class="w-full border rounded px-3 py-2" placeholder="Jumlah Qty" required />
-        </div>
-        <div class="mb-4">
-            <label for="qtyjual" class="block text-sm font-medium">Qty Jual</label>
-            <input type="number" id="qtyjual" min="0" class="w-full border rounded px-3 py-2" placeholder="Qty Jual" />
         </div>
         <div class="mb-6">
             <label for="hargabeli" class="block text-sm font-medium">Harga Beli</label>
             <input type="number" id="hargabeli" class="w-full border rounded px-3 py-2 bg-gray-100" readonly />
         </div>
         <div class="flex justify-end space-x-2">
-            <button id="simpan-barang" type="button" class="bg-[#89E355] text-white px-4 py-2 rounded hover:bg-[#7ED242]">Simpan</button>
+            <button id="simpan-barang" type="button" class="bg-[#89E355] text-white px-4 py-2 rounded hover:bg-[#7ED242]">Tambah</button>
             <button id="tutup-modal" type="button" class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400">Batal</button>
         </div>
     </div>
@@ -103,6 +116,9 @@
         </button>
     </div>
 </div>
+
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
 
 
 <script>
@@ -121,20 +137,23 @@ document.getElementById('tutup-modal').onclick = () => modal.classList.add('hidd
 kodebarangSelect.addEventListener('change', () => {
     const option = kodebarangSelect.options[kodebarangSelect.selectedIndex];
     const harga = parseFloat(option.getAttribute('data-hargabeli') || 0);
+    const konversi = parseFloat(option.getAttribute('data-konversi') || 0);
     document.getElementById('hargabeli').value = harga;
-    selectedBarang = { kodebarang: option.value, namabarang: option.textContent.trim(), hargabeli: harga };
+    selectedBarang = { kodebarang: option.value, namabarang: option.textContent.trim(), hargabeli: harga, konversi: konversi,};
 });
 
 document.getElementById('simpan-barang').onclick = () => {
     const noref = document.getElementById('noref').value.trim();
     const nodo = document.getElementById('nodo').value.trim();
     const qty = parseFloat(document.getElementById('qty').value);
-    const qtyjual = parseFloat(document.getElementById('qtyjual').value) || 0;
+    const konversi = selectedBarang.konversi || 0;
+    const qtyTon = (qty * konversi) / 1000;
+
     const hargabeli = parseFloat(document.getElementById('hargabeli').value);
 
     if (!selectedBarang || !noref || !qty || qty <= 0 || !hargabeli) return alert('Lengkapi data dengan benar!');
 
-    const data = { noref, kodebarang: selectedBarang.kodebarang, namabarang: selectedBarang.namabarang, nodo, qty, qtyjual, hargabeli };
+    const data = { noref, kodebarang: selectedBarang.kodebarang, namabarang: selectedBarang.namabarang, nodo, qty, qtyTon: qtyTon, hargabeli };
 
     if (editMode) {
         const i = barangList.findIndex(b => b.noref === editRef);
@@ -158,7 +177,6 @@ function openModal(item = null) {
         document.getElementById('kodebarang').value = item.kodebarang;
         document.getElementById('nodo').value = item.nodo;
         document.getElementById('qty').value = item.qty;
-        document.getElementById('qtyjual').value = item.qtyjual;
         document.getElementById('hargabeli').value = item.hargabeli;
         selectedBarang = item;
         editMode = true;
@@ -172,8 +190,7 @@ function resetForm() {
     document.getElementById('noref').value = '';
     kodebarangSelect.value = '';
     document.getElementById('nodo').value = '';
-    document.getElementById('qty').value = '';
-    document.getElementById('qtyjual').value = '';
+    document.getElementById('qty').value = '';    
     document.getElementById('hargabeli').value = '';
     selectedBarang = null;
 }
@@ -195,7 +212,7 @@ function renderTable() {
             <td class="px-2 py-1">${item.namabarang}</td>
             <td class="px-2 py-1">${item.nodo}</td>
             <td class="px-2 py-1 text-center">${item.qty}</td>
-            <td class="px-2 py-1 text-center">${item.qtyjual}</td>
+            <td class="px-2 py-1 text-center">${item.qtyTon.toFixed(3)}</td>
             <td class="px-2 py-1 text-right">Rp ${formatRupiah(item.hargabeli)}</td>
             <td class="px-2 py-1 text-right">Rp ${formatRupiah(subtotal)}</td>
         `;
@@ -292,5 +309,21 @@ document.getElementById('simpan-semua').onclick = () => {
 function hitungTotalBarang() {
     return barangList.reduce((sum, item) => sum + (item.qty * item.hargabeli), 0);
 }
+
+
+new TomSelect('#kodepemasok', {
+    create: false,
+    maxItems: 1,
+    placeholder: "Pilih pemasok...",
+    allowEmptyOption: true
+});
+
+new TomSelect('#kodebarang', {
+    create: false,
+    maxItems: 1,
+    placeholder: "Pilih barang...",
+    allowEmptyOption: true
+});
+
 </script>
 @endsection
