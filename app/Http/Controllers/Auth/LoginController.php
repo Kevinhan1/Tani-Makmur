@@ -19,27 +19,26 @@ class LoginController extends Controller
     // Proses login
     public function login(Request $request)
     {
-        // Validasi input dari form
         $request->validate([
             'namapengguna' => 'required|string|max:255',
             'katakunci' => 'required|string|min:6',
         ]);
 
-        // Ambil data pengguna dari database berdasarkan nama pengguna
+        // Ambil user tanpa filter 'aktif'
         $user = DB::table('tpengguna')->where('namapengguna', $request->namapengguna)->first();
 
-        // Jika pengguna ditemukan dan kata kunci cocok
-        if ($user && Hash::check($request->katakunci, $user->katakunci)) {
-            // Menyimpan data pengguna di session (untuk login)
-            Session::put('user', $user);
-
-            // Redirect ke dashboard atau halaman utama
-            return redirect()->route('dashboard');
+        if (!$user || !Hash::check($request->katakunci, $user->katakunci)) {
+            return back()->withInput()->with('error', 'Login salah, periksa nama pengguna atau kata kunci Anda.');
         }
 
-        // Jika login gagal, kembalikan ke halaman login dengan pesan error
-        return back()->with('error', 'Login salah, periksa nama pengguna atau kata kunci Anda.');
+        if ($user->aktif != 1) {
+            return back()->withInput()->with('error', 'Akun Anda tidak aktif.');
+        }
+
+        Session::put('user', $user);
+        return redirect()->route('dashboard');
     }
+
 
     // Menangani logout
     public function logout()

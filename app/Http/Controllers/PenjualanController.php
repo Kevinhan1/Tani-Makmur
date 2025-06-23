@@ -34,7 +34,7 @@ class PenjualanController extends Controller
 
         // Ambil data Dbeli yang masih memiliki stok > 0
         $dbeli = Dbeli::join('tbarang', 'tdbeli.kodebarang', '=', 'tbarang.kodebarang')
-                    ->select('tdbeli.noref', 'tbarang.namabarang', 'tbarang.hjual as hargajual', 'tdbeli.qty')
+                    ->select('tdbeli.noref', 'tbarang.namabarang', 'tbarang.hjual as hargajual', 'tdbeli.qty','tbarang.konversi')
                     ->where('tdbeli.qty', '>', 0)
                     ->orderBy('tdbeli.noref')
                     ->get();

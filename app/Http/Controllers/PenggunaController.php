@@ -29,21 +29,29 @@ class PenggunaController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'namapengguna' => 'required',
-            'katakunci' => 'required|min:4',
-            'status' => 'required|in:admin,user,developer',
-        ]);
+{
+    $validated = $request->validate([
+        'namapengguna' => 'required',
+        'katakunci' => 'required|min:4',
+        'status' => 'required|in:admin,user,developer',
+    ]);
 
-        $validated['kodepengguna'] = $this->getNextKodePengguna(); // generate otomatis
-        $validated['katakunci'] = Hash::make($validated['katakunci']);
-        $validated['aktif'] = $request->has('aktif') ? 1 : 0;
-
-        Pengguna::create($validated);
-
-        return redirect()->route('pengguna.index')->with('success', 'Pengguna berhasil ditambahkan');
+    // Cek nama pengguna duplikat (case-insensitive)
+    $existing = Pengguna::whereRaw('LOWER(namapengguna) = ?', [strtolower($validated['namapengguna'])])->first();
+    if ($existing) {
+        return back()->withInput()->withErrors(['namapengguna' => 'Nama Pengguna sudah digunakan.']);
     }
+
+    $validated['kodepengguna'] = $this->getNextKodePengguna();
+    $validated['katakunci'] = Hash::make($validated['katakunci']);
+    $validated['aktif'] = $request->has('aktif') ? 1 : 0;
+
+    Pengguna::create($validated);
+
+    return redirect()->route('pengguna.index')->with('success', 'Pengguna berhasil ditambahkan');
+}
+
+
 
 
     public function update(Request $request, $kodepengguna)

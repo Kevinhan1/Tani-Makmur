@@ -67,14 +67,6 @@
             </button>
         </form>
 
-        <!-- Link ke pendaftaran -->
-        <div class="text-center mt-4">
-            <p class="text-sm">Belum punya akun? 
-                <a href="{{ route('pengguna.create') }}" class="text-blue-500 hover:text-blue-600">Daftar</a>
-            </p>
-        </div>
-    </div>
-
     <!-- Script toggle password -->
     <script>
         const toggle = document.getElementById('toggle-password');

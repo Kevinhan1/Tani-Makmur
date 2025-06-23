@@ -28,7 +28,7 @@
         </div>
         <div>
             <label class="text-sm font-medium text-gray-600">Nota Beli</label>
-            <input type="text" name="notabeli" value="{{ request('notabeli') }}" class="w-full border rounded px-2 py-1" placeholder="Opsional">
+            <input type="text" name="notabeli" value="{{ request('notabeli') }}" class="w-full border rounded px-2 py-2 bg-gray-100 text-sm focus:outline-none" placeholder="Cari Nota">
         </div>
         <div class="flex items-end">
             <button type="submit" id="submitButton" class="rounded bg-gray-400 text-sm text-white px-4 py-2 hover:bg-gray-500 w-full">Tampilkan</button>

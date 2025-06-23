@@ -59,6 +59,9 @@
       <div class="mb-4">
         <label for="namapengguna">Nama Pengguna</label>
         <input type="text" name="namapengguna" id="namapengguna" class="w-full border rounded px-3 py-2" required>
+        @error('namapengguna')
+          <small class="text-red-600">{{ $message }}</small>
+        @enderror
       </div>
 
       <div class="mb-4">
@@ -95,6 +98,21 @@
 </div>
 
 <script>
+  window.addEventListener('DOMContentLoaded', () => {
+    @if ($errors->any())
+        document.getElementById('modalTitle').innerText = 'Tambah Pengguna';
+        document.getElementById('formData').action = "{{ route('pengguna.store') }}";
+        document.getElementById('formMethod').value = 'POST';
+        document.getElementById('formId').value = '';
+        document.getElementById('modalForm').classList.remove('hidden');
+
+        // Isi kembali input jika error
+        document.getElementById('namapengguna').value = @json(old('namapengguna'));
+        document.getElementById('katakunci').value = @json(old('katakunci'));
+        document.getElementById('status').value = "{{ old('status', 'user') }}";
+        document.getElementById('aktif').checked = "{{ old('aktif') }}" === "1";
+    @endif
+});
 function toggleModal() {
   document.getElementById('modalForm').classList.toggle('hidden');
 }

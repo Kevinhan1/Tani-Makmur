@@ -29,7 +29,7 @@
 <!-- Sidebar -->
 <aside class="w-64 bg-white shadow-lg h-screen fixed flex flex-col">
     <div class="text-center text-2xl font-bold py-6 text-[#89E355] italic">Tani Makmur</div>
-    <nav class="flex-3 overflow-y-auto h-[5000vh] hide-scrollbar">
+    <nav class="flex-3 overflow-y-auto h-[6000vh] hide-scrollbar">
         <ul class="space-y-2 px-4">
             <li>
                 <a href="{{ route('dashboard') }}"
@@ -40,7 +40,8 @@
             </li>
 
         <!-- Master Dropdown -->
-                <li>
+        @if(session('user') && session('user')->status === 'admin')
+        <li>
         <button class="w-full flex items-center gap-2 px-2 py-2 hover:bg-gray-100 rounded transition"
                 onclick="toggleDropdown('masterMenu', 'icon-master')">
             <div class="flex items-center gap-2">
@@ -92,6 +93,7 @@
             </li>
         </ul>
     </li>
+@endif
 
     <!-- Transaksi Dropdown -->
     <li>

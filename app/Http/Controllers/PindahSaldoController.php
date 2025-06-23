@@ -6,6 +6,7 @@ use App\Models\PindahSaldo;
 use App\Models\Rekening;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class PindahSaldoController extends Controller
 {
@@ -123,29 +124,42 @@ class PindahSaldoController extends Controller
 
 
     // Update data pindah saldo
-    public function update(Request $request, $nopindahbuku)
+public function update(Request $request, $nopindahbuku)
 {
     $request->validate([
         'tanggal' => 'required|date',
-        'rekeningasal' => 'required|exists:trekening,koderekening',
-        'rekeningtujuan' => 'required|exists:trekening,koderekening|different:rekeningasal',
-        'keterangan' => 'required|string',
+        'rekeningasal' => 'required|string|exists:trekening,koderekening|max:5',
+        'rekeningtujuan' => 'required|string|exists:trekening,koderekening|different:rekeningasal|max:5',
+        'keterangan' => 'required|string|max:255',
         'total' => 'required|numeric|min:0.01',
     ]);
 
-    // Ambil data pindah saldo yang lama
-    $pindahSaldo = PindahSaldo::findOrFail($nopindahbuku);
+    $user = session('user');
+    if (!$user) {
+        return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu.');
+    }
 
-    // Update hanya data, saldo akan ditangani oleh trigger dari tmutasirekening
-    $pindahSaldo->update([
+    $kodepengguna = $user->kodepengguna;
+
+    // Hapus mutasi lama (biar saldo dikembalikan)
+    DB::table('tmutasirekening')->where('noreferensi', $nopindahbuku)->delete();
+
+    // Hapus data lama dari tpindahbuku (trigger AFTER DELETE akan menghapus mutasi juga)
+    $old = PindahSaldo::findOrFail($nopindahbuku);
+    $old->delete();
+
+    // Simpan ulang data ke tpindahbuku (trigger AFTER INSERT akan buat mutasi baru)
+    PindahSaldo::create([
+        'nopindahbuku' => $nopindahbuku,
         'tanggal' => $request->tanggal,
         'koderekeningasal' => $request->rekeningasal,
         'koderekeningtujuan' => $request->rekeningtujuan,
         'keterangan' => $request->keterangan,
         'total' => $request->total,
+        'kodepengguna' => $kodepengguna,
     ]);
 
-    return redirect()->route('pindahsaldo.index')->with('success', 'Data pindah saldo berhasil diupdate.');
+    return redirect()->route('pindahsaldo.index')->with('success', 'Data pindah saldo berhasil diperbarui.');
 }
 
 

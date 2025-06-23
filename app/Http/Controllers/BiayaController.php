@@ -83,25 +83,29 @@ public function index(Request $request)
             'total' => 'required|numeric',
         ]);
 
-        // Ambil data user yang login dari session
+        // Ambil data rekening terlebih dahulu
+        $rekening = Rekening::where('koderekening', $request->koderekening)->first();
+
+        if (!$rekening) {
+            return back()->withInput()->withErrors(['koderekening' => 'Rekening tidak ditemukan.']);
+        }
+
+        if ($request->total > $rekening->saldo) {
+            return back()->withInput()->withErrors(['total' => 'Saldo rekening tidak cukup untuk melakukan transaksi.']);
+        }
+
+        // Ambil data user dari session
         $user = Session::get('user');
 
-        // Gabungkan data request dengan kodepengguna dari user login
         $data = $request->all();
         $data['kodepengguna'] = $user->kodepengguna;
 
+        // Simpan data biaya setelah lolos validasi saldo
         Biaya::create($data);
-        $rekening = Rekening::where('koderekening', $request->koderekening)->first();
-
-
-        if ($rekening && $request->total > $rekening->saldo) {
-            return back()
-                ->withInput()
-                ->withErrors(['total' => 'Saldo rekening tidak cukup untuk melakukan transaksi.']);
-        }
 
         return redirect()->route('biaya.index')->with('success', 'Data biaya berhasil disimpan.');
     }
+
 
 
     // Tampilkan form edit

@@ -61,10 +61,10 @@
                         <th class="px-4 py-3 w-8 font-normal"></th>
                         <th class="px-4 py-3 font-normal">No Ref</th>
                         <th class="px-4 py-3 font-normal">Nama Barang</th>
-                        <th class="px-4 py-3 font-normal">Kuantitas</th>
-                        <th class="px-4 py-3 font-normal">Kuantitas (Ton)</th>
+                        <th class="px-4 py-3 font-normal text-center">Kuantitas</th>
+                        <th class="px-4 py-3 font-normal text-center">Kuantitas (Ton)</th>
                         <th class="px-4 py-3 font-normal text-right">Harga Jual</th>
-                        <th class="px-4 py-3 font-normal text-right">          </th>
+                        <th class="px-4 py-3 font-normal text-center">          </th>
                         <th class="px-4 py-3 font-normal text-right">Subtotal</th>
                     </tr>
                 </thead>
@@ -90,7 +90,11 @@
             <select id="noref" class="w-full border rounded px-3 py-2">
                 <option value="">Pilih No Ref</option>
                 @foreach($dbeli as $ref)
-                    <option value="{{ $ref->noref }}" data-namabarang="{{ $ref->namabarang }}" data-hargajual="{{ $ref->hargajual }}">
+                    <option 
+                        value="{{ $ref->noref }}"
+                        data-namabarang="{{ $ref->namabarang }}"
+                        data-hargajual="{{ $ref->hargajual }}"
+                        data-konversi="{{ $ref->konversi ?? 0 }}">
                         {{ $ref->noref }}
                     </option>
                 @endforeach
@@ -167,15 +171,18 @@ document.getElementById('tutup-modal').onclick = () => modal.classList.add('hidd
 
 document.getElementById('simpan-barang').onclick = () => {
     const noref = document.getElementById('noref').value.trim();
-    const namabarang = refInput.dataset.namabarang || '';
+    const option = document.querySelector(`#noref option[value="${noref}"]`);
+    
+    const namabarang = option?.dataset.namabarang || '';
+    const hargajual = parseFloat(option?.dataset.hargajual || 0);
+    const konversi = parseFloat(option?.dataset.konversi || 0);
     const qty = parseFloat(document.getElementById('qtyjual').value);
-    const hargajual = parseFloat(document.getElementById('hargajual').value);
 
-    if (!noref || !qty || !hargajual || !namabarang) {
+    if (!noref || !qty || !hargajual || !namabarang || !konversi) {
         return alert("Isi semua data dengan benar!");
     }
 
-    const qtyton = qty / 1000;
+    const qtyton = (qty * konversi) / 1000;
     const subtotal = qty * hargajual;
 
     barangList.push({ noref, namabarang, qty, qtyton, hargajual, subtotal });
@@ -200,10 +207,10 @@ function renderTable() {
             <td class="px-2 py-1 text-center text-red-500 cursor-pointer" onclick="hapus(${index})">&times;</td>
             <td class="px-2 py-1">${item.noref}</td>
             <td class="px-2 py-1">${item.namabarang}</td>
-            <td class="px-2 py-1">${item.qty}</td>
-            <td class="px-2 py-1">${item.qtyton.toFixed(3)}</td>
+            <td class="px-2 py-1 text-center">${item.qty}</td>
+            <td class="px-2 py-1 text-center">${item.qtyton.toFixed(3)}</td>
             <td class="px-2 py-1 text-right">Rp ${formatRupiah(item.hargajual)}</td>
-            <th class="px-4 py-3 font-normal text-right">                     </th>
+            <th class="px-3 py-3 font-normal text-center">                     </th>
             <td class="px-2 py-1 text-right">Rp ${formatRupiah(item.subtotal)}</td>
         </tr>`;
         tbody.innerHTML += row;
