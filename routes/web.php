@@ -8,12 +8,20 @@ use App\Http\Controllers\PemasokController;
 use App\Http\Controllers\PelangganController;
 use App\Http\Controllers\RekeningController;
 use App\Http\Controllers\PenggunaController;
+
 use App\Http\Controllers\BiayaController;
 use App\Http\Controllers\PindahSaldoController;
 use App\Http\Controllers\PembelianController;
 use App\Http\Controllers\PenjualanController;
 use App\Http\Controllers\PembayaranPembelianController;
+use App\Http\Controllers\PembayaranPenjualanController;
+
 use App\Http\Controllers\MutasiRekeningController;
+use App\Http\Controllers\MutasiStokController;
+
+
+
+
 
 // Halaman utama
 Route::get('/', function () {
@@ -65,6 +73,8 @@ Route::resource('pengguna', PenggunaController::class);
 
 
 
+
+
 //Transaksi 
 // Biaya
 Route::resource('biaya', BiayaController::class);
@@ -90,8 +100,16 @@ Route::delete('/pembayaran-pembelian/{no}', [PembayaranPembelianController::clas
 // Penjualan
 Route::resource('/penjualan', PenjualanController::class);
 Route::get('/penjualan/{notajual}/invoice', [PenjualanController::class, 'cetakInvoice'])->name('penjualan.invoice');
+
 // Pembayaran Penjualan
-Route::get('/pembayaran-penjualan', [BarangController::class, 'index'])->name('pembayaranpenjualan.index');
+Route::resource('/pembayaran-penjualan', PembayaranPenjualanController::class);
+Route::get('/pembayaran-penjualan/history/{notajual}', [PembayaranPenjualanController::class, 'getHistory']);
+Route::get('/pembayaran-penjualan/data/{no}', [PembayaranPenjualanController::class, 'getData']);
+Route::put('/pembayaran-penjualan/{no}', [PembayaranPenjualanController::class, 'update'])->name('pembayaran-penjualan.update');
+Route::delete('/pembayaran-penjualan/{no}', [PembayaranPenjualanController::class, 'destroy'])->name('pembayaran-penjualan.destroy');
+
+
+
 
 
 //laporan 
@@ -99,8 +117,10 @@ Route::get('/pembayaran-penjualan', [BarangController::class, 'index'])->name('p
 Route::get('/mutasi-rekening', [MutasiRekeningController::class, 'index'])->name('mutasirekening.index');
 
 
+// Mutasi Stok
+Route::get('/mutasi-stok', [MutasiStokController::class, 'index'])->name('mutasi-stok.index');
+Route::get('/mutasi-stok/pdf', [MutasiStokController::class, 'exportPdf'])->name('mutasi-stok.pdf');
 
-Route::get('/mutasi-stok', [BarangController::class, 'index'])->name('mutasistok.index');
 Route::get('/kas', [BarangController::class, 'index'])->name('kas.index');
 Route::get('/piutang', [BarangController::class, 'index'])->name('piutang.index');
 Route::get('/laporan-penjualan', [BarangController::class, 'index'])->name('laporanpenjualan.index');

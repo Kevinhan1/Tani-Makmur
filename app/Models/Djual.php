@@ -21,4 +21,9 @@ class Djual extends Model
     {
         return $this->belongsTo(Hjual::class, 'notajual', 'notajual');
     }
+
+        public function detailBeli()
+    {
+        return $this->belongsTo(Dbeli::class, 'noref', 'noref');
+    }
 }

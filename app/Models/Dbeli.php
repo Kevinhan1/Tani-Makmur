@@ -19,9 +19,13 @@ class Dbeli extends Model
         'qtyjual',
         'hargabeli'
     ];
-
+    
     public function barang()
     {
         return $this->belongsTo(Barang::class, 'kodebarang', 'kodebarang');
+    }
+    public function header()
+    {
+        return $this->belongsTo(Hbeli::class, 'notabeli', 'notabeli');
     }
 }
