@@ -11,8 +11,11 @@ class PemasokController extends Controller
     // Menampilkan halaman dan data pemasok
     public function index(Request $request)
     {   
-                $user = Session::get('user');
-
+        $user = Session::get('user');
+        
+        if (!session()->has('user')) {
+            return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu');
+        }
         if (!$user || $user->status !== 'admin') {
         abort(403, 'Anda tidak memiliki akses ke halaman ini.');
     }

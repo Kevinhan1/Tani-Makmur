@@ -6,49 +6,49 @@ use App\Models\Biaya;
 use App\Models\Rekening;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class BiayaController extends Controller
 {
     // Tampilkan daftar biaya
-public function index(Request $request)
-{
-    $query = Biaya::with(['rekening', 'pengguna'])->orderBy('nobiaya', 'desc');
+    public function index(Request $request)
+    {   
+            if (!session()->has('user')) {
+            return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu');
+        }
 
-    // Filter berdasarkan tanggal jika diisi
-    if ($request->filled('tanggal_awal') && $request->filled('tanggal_akhir')) {
-        $query->whereBetween('tanggal', [$request->tanggal_awal, $request->tanggal_akhir]);
-    } else {
-        // Jika tidak memilih tanggal, return view kosong
-        return view('biaya', [
-            'biaya' => collect(), // Kosongkan data biaya
-            'rekening' => Rekening::orderBy('namarekening')->get(),
-            'nextCode' => $this->generateKodeBiaya()
-        ]);
+        
+        $query = Biaya::with(['rekening', 'pengguna'])->orderBy('nobiaya', 'desc');
+
+        // Filter berdasarkan tanggal jika diisi
+        $tanggalAwal = $request->tanggal_awal ?? date('Y-m-d', strtotime('-7 days'));
+        $tanggalAkhir = $request->tanggal_akhir ?? date('Y-m-d');
+
+        $query->whereBetween('tanggal', [$tanggalAwal, $tanggalAkhir]);
+
+        // Filter pencarian jika ada
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('nobiaya', 'like', "%$search%")
+                ->orWhere('tanggal', 'like', "%$search%")
+                ->orWhere('keterangan', 'like', "%$search%")
+                ->orWhere('total', 'like', "%$search%");
+            })
+            ->orWhereHas('rekening', function ($q) use ($search) {
+                $q->where('namarekening', 'like', "%$search%");
+            })
+            ->orWhereHas('pengguna', function ($q) use ($search) {
+                $q->where('namapengguna', 'like', "%$search%");
+            });
+        }
+
+        $biaya = $query->paginate(15)->withQueryString();
+        $rekening = Rekening::orderBy('namarekening')->get();
+        $nextCode = $this->generateKodeBiaya();
+
+        return view('biaya', compact('biaya', 'rekening', 'nextCode', 'tanggalAwal', 'tanggalAkhir'));
     }
-
-    // Filter pencarian jika ada
-    if ($request->filled('search')) {
-        $search = $request->search;
-        $query->where(function ($q) use ($search) {
-            $q->where('nobiaya', 'like', "%$search%")
-            ->orWhere('tanggal', 'like', "%$search%")
-            ->orWhere('keterangan', 'like', "%$search%")
-            ->orWhere('total', 'like', "%$search%");
-        })
-        ->orWhereHas('rekening', function ($q) use ($search) {
-            $q->where('namarekening', 'like', "%$search%");
-        })
-        ->orWhereHas('pengguna', function ($q) use ($search) {
-            $q->where('namapengguna', 'like', "%$search%");
-        });
-    }
-
-    $biaya = $query->paginate(15)->withQueryString();
-    $rekening = Rekening::orderBy('namarekening')->get();
-    $nextCode = $this->generateKodeBiaya();
-
-    return view('biaya', compact('biaya', 'rekening', 'nextCode'));
-}
 
 
     // Generate nobiaya otomatis: BY-yyyymmdd-001 (pakai tanda - bukan /)
@@ -140,4 +140,45 @@ public function index(Request $request)
 
         return response()->json(['message' => 'Data biaya berhasil dihapus']);
     }
+
+    public function exportPdf(Request $request)
+    {
+        // Ambil data dengan filter yang sama seperti index()
+        $query = Biaya::with(['rekening', 'pengguna'])->orderBy('nobiaya', 'desc');
+
+        // Filter tanggal
+        $tanggalAwal = $request->tanggal_awal ?? date('Y-m-d', strtotime('-7 days'));
+        $tanggalAkhir = $request->tanggal_akhir ?? date('Y-m-d');
+        $query->whereBetween('tanggal', [$tanggalAwal, $tanggalAkhir]);
+
+        // Filter pencarian
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('nobiaya', 'like', "%$search%")
+                    ->orWhere('tanggal', 'like', "%$search%")
+                    ->orWhere('keterangan', 'like', "%$search%")
+                    ->orWhere('total', 'like', "%$search%");
+            })
+            ->orWhereHas('rekening', function ($q) use ($search) {
+                $q->where('namarekening', 'like', "%$search%");
+            })
+            ->orWhereHas('pengguna', function ($q) use ($search) {
+                $q->where('namapengguna', 'like', "%$search%");
+            });
+        }
+
+        $biaya = $query->get(); // ambil semua tanpa pagination
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('biaya-pdf', [
+            'biaya' => $biaya,
+            'tanggalAwal' => $tanggalAwal,
+            'tanggalAkhir' => $tanggalAkhir,
+            'search' => $request->search,
+        ])->setPaper('A4', 'portrait');
+
+        return $pdf->stream('biaya-' . now()->format('Ymd_His') . '.pdf');
+    }
+
+
 }

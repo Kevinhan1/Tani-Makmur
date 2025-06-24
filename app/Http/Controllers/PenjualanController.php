@@ -17,7 +17,13 @@ class PenjualanController extends Controller
 {
     // Menampilkan halaman utama input penjualan
     public function index()
-    {
+    {   
+        $user = Session::get('user');
+
+        if (!session()->has('user')) {
+            return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu');
+        }
+        
         $barang = Barang::where('aktif', 1)->get();
         $pelanggan = Pelanggan::where('aktif', 1)->get();
 

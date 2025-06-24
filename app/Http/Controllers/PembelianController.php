@@ -13,7 +13,12 @@ use Barryvdh\DomPDF\Facade\Pdf;
 class PembelianController extends Controller
 {
     public function index()
-    {
+    {   
+        $user = Session::get('user');
+        
+        if (!session()->has('user')) {
+            return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu');
+        }
         $pemasok = Pemasok::where('aktif', 1)->get();
         $barang = Barang::where('aktif', 1)->get();
         $notabeli = $this->generateNoNotaBeli();

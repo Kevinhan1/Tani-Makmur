@@ -5,89 +5,89 @@
 
 @section('content')
 <div class="bg-white p-6 rounded shadow" style="min-height: 800px;">
-    <div class="flex justify-between items-center mb-6">
-        {{-- KIRI: Judul dan Filter --}}
-        <div class="flex items-end gap-6">
-            <div>
-                <h2 class="text-2xl font-semibold mb-1">Data Biaya</h2>
-            </div>
+    {{-- HEADER --}}
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="text-2xl font-semibold">Data Biaya</h2>
 
-            {{-- FORM FILTER --}}
-            <form method="GET" action="{{ route('biaya.index') }}" class="flex items-end space-x-4">
+        {{-- Pagination + Tombol Tambah --}}
+        <div class="flex items-center gap-4 text-sm text-gray-700">
 
-                <div class="flex flex-col">
-                    <label for="tanggal_awal" class="text-sm text-gray-600 mb-1">Tanggal Awal</label>
-                    <input type="date" name="tanggal_awal" id="tanggal_awal"
-                        value="{{ request('tanggal_awal') }}"
-                        class="border rounded px-3 py-2 bg-gray-100 text-sm focus:outline-none" required>
-                </div>
-
-                <div class="flex flex-col">
-                    <label for="tanggal_akhir" class="text-sm text-gray-600 mb-1">Tanggal Akhir</label>
-                    <input type="date" name="tanggal_akhir" id="tanggal_akhir"
-                        value="{{ request('tanggal_akhir') }}"
-                        class="border rounded px-3 py-2 bg-gray-100 text-sm focus:outline-none" required>
-                </div>
-
-                <div>
-                    <button type="submit"
-                        class="mt-5 bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500">
-                        Tampilkan
+                        {{-- Tombol Tambah --}}
+                <div id="actionButtons">
+                    <button type="button" onclick="openModalForAdd()"
+                        class="bg-[#89E355] text-white px-4 py-2 rounded hover:bg-[#7ED242] ml-4">
+                        Tambah +
                     </button>
                 </div>
-            </form>
-        </div>
 
-        {{-- KANAN: Tombol Tambah --}}
-        <div id="actionButtons">
-            <button type="button" onclick="openModalForAdd()"
-                class="bg-[#89E355] text-white px-4 py-2 rounded hover:bg-[#7ED242]">
-                Tambah +
-            </button>
+            @if ($biaya instanceof \Illuminate\Pagination\LengthAwarePaginator && $biaya->count())
+                <span>Halaman {{ $biaya->currentPage() }} dari {{ $biaya->lastPage() }}</span>
+
+                {{-- Panah kiri --}}
+                @if ($biaya->onFirstPage())
+                    <span class="px-2 py-1 border border-gray-400 text-gray-400 rounded font-bold cursor-not-allowed">
+                        <svg class="w-4 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </span>
+                @else
+                    <a href="{{ request()->fullUrlWithQuery(['page' => $biaya->currentPage() - 1]) }}"
+                        class="px-2 py-1 border border-gray-700 text-gray-800 rounded hover:bg-gray-100 font-bold">
+                        <svg class="w-4 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </a>
+                @endif
+
+                {{-- Panah kanan --}}
+                @if ($biaya->hasMorePages())
+                    <a href="{{ request()->fullUrlWithQuery(['page' => $biaya->currentPage() + 1]) }}"
+                        class="px-2 py-1 border border-gray-700 text-gray-800 rounded hover:bg-gray-100 font-bold">
+                        <svg class="w-4 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </a>
+                @else
+                    <span class="px-2 py-1 border border-gray-400 text-gray-400 rounded font-bold cursor-not-allowed">
+                        <svg class="w-4 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </span>
+                @endif
+            @endif
         </div>
     </div>
 
-
-    {{-- PAGINATION INFO DAN KONTROL --}}
-    @if ($biaya instanceof \Illuminate\Pagination\LengthAwarePaginator && $biaya->count())
-        <div class="flex justify-end items-center mb-3 text-sm text-gray-700 space-x-2">
-            <span>
-                Halaman {{ $biaya->currentPage() }} dari {{ $biaya->lastPage() }}
-            </span>
-
-            {{-- Panah kiri --}}
-            @if ($biaya->onFirstPage())
-                <span class="px-2 py-1 border border-gray-400 text-gray-400 rounded cursor-not-allowed font-bold">
-                    <svg class="w-4 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
-                    </svg>
-                </span>
-            @else
-                <a href="{{ request()->fullUrlWithQuery(['page' => $biaya->currentPage() - 1]) }}"
-                class="px-2 py-1 border border-gray-700 text-gray-800 rounded hover:bg-gray-100 font-bold">
-                    <svg class="w-4 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
-                    </svg>
-                </a>
-            @endif
-
-            {{-- Panah kanan --}}
-            @if ($biaya->hasMorePages())
-                <a href="{{ request()->fullUrlWithQuery(['page' => $biaya->currentPage() + 1]) }}"
-                class="px-2 py-1 border border-gray-700 text-gray-800 rounded hover:bg-gray-100 font-bold">
-                    <svg class="w-4 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
-                    </svg>
-                </a>
-            @else
-                <span class="px-2 py-1 border border-gray-400 text-gray-400 rounded cursor-not-allowed font-bold">
-                    <svg class="w-4 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
-                    </svg>
-                </span>
-            @endif
+    {{-- FILTER FORM --}}
+    <form method="GET" action="{{ route('biaya.index') }}" class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+        <div>
+            <label class="text-sm text-gray-600">Tanggal Awal</label>
+            <input type="date" name="tanggal_awal" value="{{ request('tanggal_awal', date('Y-m-d', strtotime('-7 days'))) }}"
+                class="w-full border rounded px-3 py-2 text-sm focus:outline-none">
         </div>
-    @endif
+
+        <div>
+            <label class="text-sm text-gray-600">Tanggal Akhir</label>
+            <input type="date" name="tanggal_akhir" value="{{ request('tanggal_akhir', date('Y-m-d')) }}"
+                class="w-full border rounded px-3 py-2 text-sm focus:outline-none">
+        </div>
+
+        <div class="flex items-end">
+            <button type="submit" class="rounded bg-gray-400 text-sm text-white px-6 py-2 hover:bg-gray-500 w-full">
+                Tampilkan
+            </button>
+        </div>
+        <div class="flex items-end">
+            <a href="{{ route('biaya.pdf', request()->all()) }}"
+                target="_blank"
+                class="flex gap-2 justify-center rounded border border-gray-300 bg-gray-100 text-sm text-gray px-4 py-2 hover:bg-gray-400 w-full">
+                <span class="text-center">Print PDF</span>
+                <img src="{{ asset('icons/printer.svg') }}" alt="Printer Icon" class="w-5 h-5">
+            </a>
+        </div>
+    </form>
+
+    
 
 
 
@@ -105,16 +105,10 @@
             </tr>
         </thead>
         <tbody>
-            @if (!request('tanggal_awal') || !request('tanggal_akhir'))
+            @if ($biaya->isEmpty())
                 <tr>
                     <td colspan="7" class="text-center text-gray-500 py-4">
-                        Silakan pilih rentang tanggal untuk menampilkan data.
-                    </td>
-                </tr>
-            @elseif ($biaya->isEmpty())
-                <tr>
-                    <td colspan="7" class="text-center text-gray-500 py-4">
-                        Tidak ada data ditemukan untuk rentang tanggal tersebut.
+                        Tidak ada data ditemukan.
                     </td>
                 </tr>
             @else

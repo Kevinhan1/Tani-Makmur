@@ -7,48 +7,45 @@ use App\Models\Rekening;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Session;
 
 class PindahSaldoController extends Controller
 {
     // Tampilkan daftar pindah saldo
     public function index(Request $request)
-        {
-            $query = PindahSaldo::with(['rekeningAsal', 'rekeningTujuan', 'pengguna'])
-                ->orderBy('tanggal', 'desc')
-                ->orderBy('nopindahbuku', 'desc');
-
-            // Filter berdasarkan tanggal jika dipilih
-            if ($request->filled('tanggal_awal') && $request->filled('tanggal_akhir')) {
-                $query->whereBetween('tanggal', [$request->tanggal_awal, $request->tanggal_akhir]);
-            } else {
-                // Jika tidak pilih tanggal, tampilkan kosong
-                return view('pindahsaldo', [
-                    'pindahsaldo' => collect(),
-                    'rekening' => Rekening::all(),
-                    'nextCode' => $this->generateKodePindahSaldo(date('Y-m-d'))
-                ]);
-            }
-
-            // Filter pencarian jika ada
-            if ($request->filled('search')) {
-                $search = $request->search;
-                $query->where(function ($q) use ($search) {
-                    $q->where('nopindahbuku', 'like', "%$search%")
-                        ->orWhere('tanggal', 'like', "%$search%")
-                        ->orWhere('keterangan', 'like', "%$search%")
-                        ->orWhere('total', 'like', "%$search%");
-                })
-                ->orWhereHas('rekeningAsal', fn($q) => $q->where('namarekening', 'like', "%$search%"))
-                ->orWhereHas('rekeningTujuan', fn($q) => $q->where('namarekening', 'like', "%$search%"))
-                ->orWhereHas('pengguna', fn($q) => $q->where('namapengguna', 'like', "%$search%"));
-            }
-
-            $pindahsaldo = $query->paginate(15)->withQueryString();
-            $rekening = Rekening::all();
-            $nextCode = $this->generateKodePindahSaldo(date('Y-m-d'));
-
-            return view('pindahsaldo', compact('pindahsaldo', 'rekening', 'nextCode'));
+    {   
+        $user = Session::get('user');
+        if (!session()->has('user')) {
+            return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu');
         }
+
+        $tanggalAwal = $request->tanggal_awal ?? date('Y-m-d', strtotime('-7 days'));
+        $tanggalAkhir = $request->tanggal_akhir ?? date('Y-m-d');
+
+        $query = PindahSaldo::with(['rekeningAsal', 'rekeningTujuan', 'pengguna'])
+            ->whereBetween('tanggal', [$tanggalAwal, $tanggalAkhir])
+            ->orderBy('nopindahbuku', 'desc');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('nopindahbuku', 'like', "%$search%")
+                    ->orWhere('tanggal', 'like', "%$search%")
+                    ->orWhere('keterangan', 'like', "%$search%")
+                    ->orWhere('total', 'like', "%$search%");
+            })
+            ->orWhereHas('rekeningAsal', fn($q) => $q->where('namarekening', 'like', "%$search%"))
+            ->orWhereHas('rekeningTujuan', fn($q) => $q->where('namarekening', 'like', "%$search%"))
+            ->orWhereHas('pengguna', fn($q) => $q->where('namapengguna', 'like', "%$search%"));
+        }
+
+        $pindahsaldo = $query->paginate(15)->withQueryString();
+        $rekening = Rekening::orderBy('namarekening')->get();
+        $nextCode = $this->generateKodePindahSaldo($tanggalAkhir);
+
+        return view('pindahsaldo', compact('pindahsaldo', 'rekening', 'nextCode', 'tanggalAwal', 'tanggalAkhir'));
+    }
 
 
     // Generate kode pindah buku otomatis sesuai format PB-YYYYMMDD-XXX
@@ -177,5 +174,31 @@ public function update(Request $request, $nopindahbuku)
         }
 
         return response()->json(['message' => 'Data berhasil dihapus']);
+    }
+
+
+    
+    public function exportPdf(Request $request)
+    {
+        $tanggal_awal = $request->input('tanggal_awal');
+        $tanggal_akhir = $request->input('tanggal_akhir');
+
+        $query = PindahSaldo::with(['rekeningAsal', 'rekeningTujuan', 'pengguna'])
+            ->when($tanggal_awal, function ($q) use ($tanggal_awal) {
+                $q->whereDate('tanggal', '>=', $tanggal_awal);
+            })
+            ->when($tanggal_akhir, function ($q) use ($tanggal_akhir) {
+                $q->whereDate('tanggal', '<=', $tanggal_akhir);
+            })
+            ->orderBy('tanggal', 'desc')
+            ->get();
+
+        $pdf = Pdf::loadView('pindahsaldo-pdf', [
+            'data' => $query,
+            'tanggal_awal' => $tanggal_awal,
+            'tanggal_akhir' => $tanggal_akhir,
+        ])->setPaper('a4', 'potrait');
+
+        return $pdf->stream('laporan-pindah-saldo -'. now()->format('Ymd_His') . '.pdf');
     }
 }

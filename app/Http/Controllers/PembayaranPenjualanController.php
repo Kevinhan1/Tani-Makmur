@@ -13,7 +13,11 @@ use Carbon\Carbon;
 class PembayaranPenjualanController extends Controller
 {
     public function index(Request $request)
-    {
+    {   
+        if (!session()->has('user')) {
+            return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu');
+        }
+        
         $tanggalAwal = $request->tanggal_awal ?? now()->subDays(7)->toDateString();
         $tanggalAkhir = $request->tanggal_akhir ?? now()->toDateString();
 

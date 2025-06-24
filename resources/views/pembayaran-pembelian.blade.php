@@ -4,7 +4,7 @@
 @section('page', 'Pembayaran Pembelian')
 
 @section('content')
-<div class="bg-white p-6 rounded shadow" style="min-height: 600px;">
+<div class="bg-white p-6 rounded shadow" style="min-height: 800px;">
     <div class="mb-4">
         <h2 class="text-2xl font-semibold mb-2">Data Pembayaran Pembelian</h2>
 

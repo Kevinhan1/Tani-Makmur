@@ -13,7 +13,10 @@ class PenggunaController extends Controller
 
         $user = Session::get('user');
 
-        if (!$user || $user->status !== 'admin') {
+        if (!session()->has('user')) {
+            return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu');
+        }
+        elseif (!$user || $user->status !== 'admin') {
         abort(403, 'Anda tidak memiliki akses ke halaman ini.');
     }
         $query = Pengguna::query();

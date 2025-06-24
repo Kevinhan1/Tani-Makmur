@@ -13,21 +13,21 @@
             <div class="flex justify-between items-center mb-6">
                 <p style="font-size: 20px;" class="font-medium">Total Penjualan</p>
             </div>
-            <p style="font-size: 24px;" class="font-medium">Rp5000.000</p>
+            <p style="font-size: 24px;" class="font-medium">Rp{{ number_format($totalHariIni, 0, ',', '.') }}</p>
         </div>
 
         <div class="bg-white p-6 rounded shadow" style="height: 150px; min-width: 520px;">
             <div class="flex justify-between items-center mb-6">
                 <p style="font-size: 20px;" class="font-medium">Transaksi</p>
             </div>
-            <p style="font-size: 24px;" class="font-medium">24</p>
+            <p style="font-size: 24px;" class="font-medium">{{ $transaksiHariIni }}</p>
         </div>
 
         <div class="bg-white p-6 rounded shadow" style="height: 150px; min-width: 520px;">
             <div class="flex justify-between items-center mb-6">
                 <p style="font-size: 20px;" class="font-medium">Produk terjual</p>
             </div>
-            <p style="font-size: 24px;" class="font-medium">200</p>
+            <p style="font-size: 24px;" class="font-medium">{{ $produkTerjualHariIni }}</p>
         </div>
     </div>
 
@@ -37,21 +37,21 @@
             <div class="flex justify-between items-center mb-6">
                 <p style="font-size: 20px;" class="font-medium">Total Penjualan</p>
             </div>
-            <p style="font-size: 24px;" class="font-medium">Rp100.000.000</p>
+            <p style="font-size: 24px;" class="font-medium">Rp{{ number_format($totalBulanIni, 0, ',', '.') }}</p>
         </div>
 
         <div class="bg-white p-6 rounded shadow" style="height: 150px; min-width: 520px;">
             <div class="flex justify-between items-center mb-6">
                 <p style="font-size: 20px;" class="font-medium">Transaksi</p>
             </div>
-            <p style="font-size: 24px;" class="font-medium">60  </p>
+            <p style="font-size: 24px;" class="font-medium">{{ $transaksiBulanIni }}</p>
         </div>
 
         <div class="bg-white p-6 rounded shadow" style="height: 150px; width: 520px;">
             <div class="flex justify-between items-center mb-6">
                 <p style="font-size: 20px;" class="font-medium">Produk terjual</p>
             </div>
-            <p style="font-size: 24px;" class="font-medium">200</p>
+            <p style="font-size: 24px;" class="font-medium">{{ $produkTerjualBulanIni }}</p>
         </div>
     </div>
 
@@ -62,7 +62,7 @@
             <div class="flex justify-between items-center mb-6">
                 <p style="font-size: 20px;" class="font-medium">Produk Terlaris</p>
             </div>
-            <p style="font-size: 24px;" class="font-medium">Pupuk NPK / 10 kg zak </p>
+            <p style="font-size: 24px;" class="font-medium">{{ $produkTerlaris ?? '-' }}</p>
         </div>
     </div>  
 @endsection

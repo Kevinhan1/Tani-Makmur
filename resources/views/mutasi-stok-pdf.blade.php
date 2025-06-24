@@ -14,7 +14,7 @@
 <body>
     <h2 style="text-align: center;">Laporan Mutasi Stok</h2>
     <p>Periode: {{ \Carbon\Carbon::parse($tanggalAwal)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($tanggalAkhir)->format('d/m/Y') }}</p>
-    <p>Jenis: {{ $jenis ?? 'Semua' }}</p>
+    <p>Jenis: {{ request('jenis') ?? 'Semua' }}</p>
 
     <table>
         <thead>

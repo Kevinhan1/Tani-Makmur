@@ -14,7 +14,12 @@ use Carbon\Carbon;
 class PembayaranPembelianController extends Controller
 {
     public function index(Request $request)
-    {
+    {   
+        $user = Session::get('user');
+
+        if (!session()->has('user')) {
+            return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu');
+        }
         // Validasi tanggal
         $tanggalAwal = $request->tanggal_awal ?? now()->subDays(7)->toDateString();
         $tanggalAkhir = $request->tanggal_akhir ?? now()->toDateString();
@@ -54,7 +59,7 @@ class PembayaranPembelianController extends Controller
     }
 
     public function store(Request $request)
-{
+    {
     $request->validate([
         'notabeli' => 'required',
         'tanggal_bayar' => 'required|date',

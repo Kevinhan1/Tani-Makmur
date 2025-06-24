@@ -18,7 +18,8 @@ use App\Http\Controllers\PembayaranPenjualanController;
 
 use App\Http\Controllers\MutasiRekeningController;
 use App\Http\Controllers\MutasiStokController;
-
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\KasController;
 
 
 
@@ -41,14 +42,7 @@ Route::get('logout', [LoginController::class, 'logout'])->name('logout');
 
 
 // Rute untuk halaman dashboard
-Route::get('dashboard', function () {
-    // Memastikan hanya pengguna yang sudah login yang bisa mengakses dashboard
-    if (session()->has('user')) {
-        return view('dashboard');
-    } else {
-        return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu');
-    }
-})->name('dashboard');
+Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
 //Master
 //Barang
@@ -77,10 +71,12 @@ Route::resource('pengguna', PenggunaController::class);
 
 //Transaksi 
 // Biaya
+Route::get('/biaya/pdf', [BiayaController::class, 'exportPdf'])->name('biaya.pdf');
 Route::resource('biaya', BiayaController::class);
 
 
-// Pindah Buku
+// Pindah Saldo 
+Route::get('/pindahsaldo/pdf', [PindahSaldoController::class, 'exportPdf'])->name('pindahsaldo.pdf');
 Route::resource('pindahsaldo', PindahSaldoController::class);
 
 
@@ -115,6 +111,7 @@ Route::delete('/pembayaran-penjualan/{no}', [PembayaranPenjualanController::clas
 //laporan 
 //Mutasi Rekening
 Route::get('/mutasi-rekening', [MutasiRekeningController::class, 'index'])->name('mutasirekening.index');
+Route::get('mutasirekening/pdf', [MutasiRekeningController::class, 'exportPdf'])->name('mutasirekening.pdf');
 
 
 // Mutasi Stok
@@ -122,6 +119,9 @@ Route::get('/mutasi-stok', [MutasiStokController::class, 'index'])->name('mutasi
 Route::get('/mutasi-stok/pdf', [MutasiStokController::class, 'exportPdf'])->name('mutasi-stok.pdf');
 
 Route::get('/kas', [BarangController::class, 'index'])->name('kas.index');
+Route::get('/kas', [KasController::class, 'index'])->name('kas.index');
+Route::get('/kas/pdf', [KasController::class, 'exportPdf'])->name('kas.pdf');
+
 Route::get('/piutang', [BarangController::class, 'index'])->name('piutang.index');
 Route::get('/laporan-penjualan', [BarangController::class, 'index'])->name('laporanpenjualan.index');
 

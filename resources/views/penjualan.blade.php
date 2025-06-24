@@ -127,7 +127,6 @@
     </div>
 </div>
 
-
 <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
 
@@ -274,11 +273,14 @@ document.getElementById('simpan-semua').addEventListener('click', () => {
             window.open(invoiceUrl, '_blank');
 
             // ✅ Tampilkan modal sukses
-            showModal(`Data penjualan berhasil disimpan!`, () => {
+            showModalAlert('Data penjualan berhasil disimpan!', () => {
                 window.location.href = "{{ route('penjualan.index') }}";
             });
-        } else {
-            showModal(`Gagal menyimpan: ${result.message}`);
+        } 
+        else {
+            showModalAlert(`Gagal menyimpan: ${result.message}`, () => {
+                window.location.href = "{{ route('penjualan.index') }}";
+        });
         }
     })
     .catch(err => {
@@ -288,16 +290,32 @@ document.getElementById('simpan-semua').addEventListener('click', () => {
 });
 
 
-function showModal(msg) {
-    document.getElementById('custom-modal-message').textContent = msg;
-    document.getElementById('custom-modal').classList.remove('hidden');
+// ✅ Modal Alert support callback
+function showModalAlert(message, callback) {
+    const modal = document.getElementById('custom-modal');
+    const messageEl = document.getElementById('custom-modal-message');
+    const okBtn = document.getElementById('custom-modal-ok');
+
+    messageEl.textContent = message;
+    modal.classList.remove('hidden');
+
+    const newOkBtn = okBtn.cloneNode(true);
+    okBtn.parentNode.replaceChild(newOkBtn, okBtn);
+
+    newOkBtn.addEventListener('click', () => {
+        modal.classList.add('hidden');
+        if (typeof callback === 'function') {
+            callback();
+        }
+    });
 }
-document.getElementById('custom-modal-ok').addEventListener('click', () => {
-    document.getElementById('custom-modal').classList.add('hidden');
-});
 
+// Optional versi pendek
+function showModal(msg) {
+    showModalAlert(msg);
+}
 
-
+// Inisialisasi TomSelect
 new TomSelect('#namapelanggan', {
     create: false,
     maxItems: 1,
@@ -315,11 +333,8 @@ new TomSelect('#noref', {
         if (option) {
             const namaBarang = option.dataset.namabarang || '';
             const hargaJual = option.dataset.hargajual || '';
-
             document.getElementById('namabarang').value = namaBarang;
             document.getElementById('hargajual').value = hargaJual;
-
-            // Simpan juga ke dataset untuk proses simpan
             document.getElementById('noref').dataset.namabarang = namaBarang;
         } else {
             document.getElementById('namabarang').value = '';
@@ -328,6 +343,5 @@ new TomSelect('#noref', {
         }
     }
 });
-
 </script>
 @endsection
