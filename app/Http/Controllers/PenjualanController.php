@@ -176,32 +176,40 @@ public function deleteHistory(Request $request)
     }
 }
 
-public function cetakInvoice($notajual)
-{
-    $hjual = Hjual::with(['pelanggan', 'detail'])->where('notajual', $notajual)->first();
-    if (!$hjual) {
-        return abort(404, 'Data penjualan tidak ditemukan.');
+    public function cetakInvoice($notajual)
+    {
+        $hjual = Hjual::with(['pelanggan', 'detail'])->where('notajual', $notajual)->first();
+
+        if (!$hjual) {
+            return abort(404, 'Data penjualan tidak ditemukan.');
+        }
+
+        // Ambil detail lalu join manual tdbeli + tbarang berdasarkan noref
+        $items = $hjual->detail->map(function ($item) {
+            $namabarang = DB::table('tdbeli')
+                ->join('tbarang', 'tdbeli.kodebarang', '=', 'tbarang.kodebarang')
+                ->where('tdbeli.noref', $item->noref)
+                ->value('tbarang.namabarang');
+
+            return [
+                'namabarang' => $namabarang ?? '-',
+                'qty'        => $item->qty,
+                'hargajual'  => $item->hargajual,
+            ];
+        });
+
+        $total = $items->sum(fn($item) => $item['qty'] * $item['hargajual']);
+
+        $pdf = Pdf::loadView('invoice-penjualan', [
+            'hjual'         => $hjual,
+            'notajual'      => $notajual,
+            'tanggal'       => $hjual->tanggal,
+            'namapelanggan' => $hjual->pelanggan->namapelanggan ?? '-',
+            'items'         => $items,
+            'total'         => $total
+        ])->setPaper('a5', 'landscape');
+
+        return $pdf->stream("Invoice-{$notajual}.pdf");
     }
 
-    $items = $hjual->detail->map(function ($item) {
-        return [
-            'namabarang' => optional($item->barang)->namabarang ?? '-', // pastikan relasi 'barang' ada
-            'qty' => $item->qty,
-            'hargajual' => $item->hargajual,
-        ];
-    });
-
-    $total = $items->sum(fn($item) => $item['qty'] * $item['hargajual']);
-
-    $pdf = Pdf::loadView('invoice-penjualan', [
-    'hjual' => $hjual, // tambahkan ini
-    'notajual' => $notajual,
-    'tanggal' => $hjual->tanggal,
-    'namapelanggan' => $hjual->pelanggan->namapelanggan ?? '-',
-    'items' => $items,
-    'total' => $total
-    ])->setPaper('a5', 'landscape');
-
-    return $pdf->stream("Invoice-{$notajual}.pdf");
-}
 }

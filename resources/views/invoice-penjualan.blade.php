@@ -29,21 +29,26 @@
                 <th>Subtotal</th>
             </tr>
         </thead>
-        <tbody>
-            @php $total = 0; @endphp
-            @foreach($hjual->detail as $item)
-                @php
-                    $subtotal = $item->qty * $item->hargajual;
-                    $total += $subtotal;
-                @endphp
-                <tr>
-                    <td>{{ $item->barang->namabarang ?? '-' }}</td>
-                    <td>{{ $item->qty }}</td>
-                    <td>Rp {{ number_format($item->hargajual, 0, ',', '.') }}</td>
-                    <td>Rp {{ number_format($subtotal, 0, ',', '.') }}</td>
-                </tr>
-            @endforeach
-        </tbody>
+            <tbody>
+                @php $total = 0; @endphp
+                @foreach($hjual->detail as $item)
+                    @php
+                        $subtotal = $item->qty * $item->hargajual;
+                        $total += $subtotal;
+
+                        $namabarang = \DB::table('tdbeli')
+                            ->join('tbarang', 'tdbeli.kodebarang', '=', 'tbarang.kodebarang')
+                            ->where('tdbeli.noref', $item->noref)
+                            ->value('tbarang.namabarang');
+                    @endphp
+                    <tr>
+                        <td>{{ $namabarang ?? '-' }}</td>
+                        <td>{{ $item->qty }}</td>
+                        <td>Rp {{ number_format($item->hargajual, 0, ',', '.') }}</td>
+                        <td>Rp {{ number_format($subtotal, 0, ',', '.') }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
         <tfoot>
             <tr>
                 <th colspan="3">Total</th>
