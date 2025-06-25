@@ -29,6 +29,7 @@ class MutasiRekeningController extends Controller
             $query->where('koderekening', $request->rekening);
         }
 
+
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -68,6 +69,12 @@ class MutasiRekeningController extends Controller
             if ($request->filled('rekening')) {
                 $query->where('koderekening', $request->rekening);
             }
+            
+            $rekeningNama = 'Semua';
+            if ($request->filled('rekening')) {
+                $rek = Rekening::where('koderekening', $request->rekening)->first();
+                $rekeningNama = $rek?->namarekening ?? 'Tidak ditemukan';
+            }
 
             $mutasi = $query->get();
 
@@ -75,6 +82,7 @@ class MutasiRekeningController extends Controller
                 'mutasi' => $mutasi,
                 'tanggalAwal' => $request->tanggal_awal,
                 'tanggalAkhir' => $request->tanggal_akhir,
+                'rekeningNama' => $rekeningNama,
                 'jenis' => $request->jenis,
             ])->setPaper('A4', 'portrait');
 

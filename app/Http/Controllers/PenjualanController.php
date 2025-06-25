@@ -119,6 +119,63 @@ class PenjualanController extends Controller
         }
     }
 
+
+    public function getHistory()
+    {
+        $data = DB::table('thjual')
+            ->join('tpelanggan', 'thjual.kodepelanggan', '=', 'tpelanggan.kodepelanggan')
+            ->select(
+                'thjual.notajual',
+                'thjual.tanggal',
+                'thjual.total',
+                'tpelanggan.namapelanggan'
+            )
+            ->orderByDesc('thjual.tanggal')
+            ->get();
+
+        return response()->json($data);
+    }
+
+public function deleteHistory(Request $request)
+{
+    $request->validate([
+        'notajual' => 'required',
+    ]);
+
+    $notajual = $request->notajual;
+
+    $hjual = Hjual::where('notajual', $notajual)->first();
+
+    if (!$hjual) {
+        return response()->json(['success' => false, 'message' => 'Nota tidak ditemukan.']);
+    }
+
+    if ($hjual->totalbayar > 0) {
+        return response()->json(['success' => false, 'message' => 'Sudah ada pembayaran. Tidak bisa dihapus.']);
+    }
+
+    DB::beginTransaction();
+    try {
+        $details = Djual::where('notajual', $notajual)->get();
+        foreach ($details as $d) {
+            $dbeli = Dbeli::where('noref', $d->noref)->first();
+            if ($dbeli) {
+                $dbeli->qty += $d->qty;
+                $dbeli->save();
+            }
+        }
+
+        Djual::where('notajual', $notajual)->delete();
+        $hjual->delete();
+
+        DB::commit();
+        return response()->json(['success' => true]);
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return response()->json(['success' => false, 'message' => 'Gagal menghapus: ' . $e->getMessage()]);
+    }
+}
+
 public function cetakInvoice($notajual)
 {
     $hjual = Hjual::with(['pelanggan', 'detail'])->where('notajual', $notajual)->first();

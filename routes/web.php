@@ -83,6 +83,9 @@ Route::resource('pindahsaldo', PindahSaldoController::class);
 // Pembelian
 Route::resource('/pembelian', PembelianController::class);
 Route::get('/pembelian/{notabeli}/invoice', [PembelianController::class, 'cetakInvoice']);
+Route::get('/api/history-pembelian', [PembelianController::class, 'getHistory']);
+Route::post('/api/history-pembelian/delete', [PembelianController::class, 'deleteHistory']);
+
 
 // Pembayaran Pembelian 
 Route::resource('/pembayaran-pembelian', PembayaranPembelianController::class);
@@ -96,6 +99,9 @@ Route::delete('/pembayaran-pembelian/{no}', [PembayaranPembelianController::clas
 // Penjualan
 Route::resource('/penjualan', PenjualanController::class);
 Route::get('/penjualan/{notajual}/invoice', [PenjualanController::class, 'cetakInvoice'])->name('penjualan.invoice');
+Route::get('/api/history-penjualan', [PenjualanController::class, 'getHistory']);
+Route::post('/api/history-penjualan/delete', [PenjualanController::class, 'deleteHistory']);
+
 
 // Pembayaran Penjualan
 Route::resource('/pembayaran-penjualan', PembayaranPenjualanController::class);

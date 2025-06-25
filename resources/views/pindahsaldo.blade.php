@@ -186,7 +186,7 @@
                         <script>
                             // Otomatis buka modal jika ada error
                             window.addEventListener('DOMContentLoaded', () => {
-                                toggleModal();
+                                updateActionButtons();
                             });
                         </script>
                     @enderror
@@ -217,7 +217,19 @@
         </div>
     </div>
 
+    <!-- Modal Putih -->
+<div id="custom-modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 hidden z-50">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm text-center">
+        <p id="custom-modal-message" class="text-gray-700 mb-4 text-sm"></p>
+        <button id="custom-modal-ok" class="bg-[#89E355] hover:bg-[#7ED242] text-white px-4 py-2 rounded">
+            OK
+        </button>
+    </div>
+</div>
+
     <script>
+        const isAdmin = @json(session('user') && session('user')->status === 'admin');
+    
     function toggleModal() {
         document.getElementById('modalForm').classList.toggle('hidden');
     }
@@ -253,7 +265,7 @@
 
     function editPindahSaldo(nopindahbuku) {
         if (!pindahsaldoData[nopindahbuku]) {
-            alert('Data pindah saldo tidak ditemukan!');
+            showModalAlert('Data pindah saldo tidak ditemukan!');
             return;
         }
 
@@ -275,32 +287,39 @@
     }
 
     function updateActionButtons() {
-        const checkboxes = document.querySelectorAll('.item-checkbox');
-        const selected = Array.from(checkboxes).filter(cb => cb.checked);
+    const checkboxes = document.querySelectorAll('.item-checkbox');
+    const selected = Array.from(checkboxes).filter(cb => cb.checked);
 
-        checkboxes.forEach(cb => {
-            cb.classList.remove('accent-green-500', 'accent-gray-400');
-            cb.classList.add(cb.checked ? 'accent-green-500' : 'accent-gray-400');
-        });
+    checkboxes.forEach(cb => {
+        cb.classList.remove('accent-green-500', 'accent-gray-400');
+        cb.classList.add(cb.checked ? 'accent-green-500' : 'accent-gray-400');
+    });
 
-        const container = document.getElementById('actionButtons');
-        container.innerHTML = '';
+    const container = document.getElementById('actionButtons');
+    container.innerHTML = '';
 
+    // ✅ Jika tidak ada yang dicentang → tampilkan tombol Tambah (semua user bisa lihat)
+    if (selected.length === 0) {
+        container.innerHTML = `
+            <button onclick="openModalForAdd()" class="bg-[#89E355] text-white px-4 py-2 rounded hover:bg-[#7ED242]">Tambah +</button>
+        `;
+        return;
+    }
+
+    // ✅ Jika admin dan ada yang dicentang
+    if (isAdmin) {
         if (selected.length === 1) {
             container.innerHTML = `
                 <button onclick="editPindahSaldo('${selected[0].value}')" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Edit</button>
                 <button onclick="hapusPindahSaldo()" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 ml-2">Hapus</button>
             `;
-        } else if (selected.length > 1) {
+        } else {
             container.innerHTML = `
                 <button onclick="hapusPindahSaldo()" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Hapus</button>
             `;
-        } else {
-            container.innerHTML = `
-                <button onclick="openModalForAdd()" class="bg-[#89E355] text-white px-4 py-2 rounded hover:bg-[#7ED242]">Tambah +</button>
-            `;
         }
     }
+}
 
     function showConfirmDelete(message) {
         return new Promise((resolve) => {
@@ -333,6 +352,19 @@
         });
     }
 
+    function showModalAlert(message, callbackOk = null) {
+        const modal = document.getElementById('custom-modal');
+        const msgContainer = document.getElementById('custom-modal-message');
+        const okBtn = document.getElementById('custom-modal-ok');
+
+        msgContainer.textContent = message;
+        modal.classList.remove('hidden');
+
+        okBtn.onclick = () => {
+            modal.classList.add('hidden');
+            if (typeof callbackOk === 'function') callbackOk();
+        };
+    }
 
     async function hapusPindahSaldo() {
     const selected = Array.from(document.querySelectorAll('.item-checkbox'))
@@ -340,7 +372,7 @@
         .map(cb => cb.value);
 
     if (selected.length === 0) {
-        alert('Pilih data yang akan dihapus terlebih dahulu.');
+        showModalAlert('Pilih data yang akan dihapus terlebih dahulu.');
         return;
     }
 
@@ -368,7 +400,7 @@
             checkbox.closest('tr').remove();
         }
         } catch (error) {
-        alert(`Error hapus ${nopindahbuku}: ${error.message}`);
+        showModalAlert(`Error hapus ${nopindahbuku}: ${error.message}`);
         }
     }
 
@@ -378,7 +410,7 @@
     function confirmSubmit() {
         const total = parseFloat(document.getElementById('total').value);
     if (isNaN(total) || total <= 0) {
-        alert("Total harus lebih dari 0.");
+        showModalAlert("Total harus lebih dari 0.");
         return false;
     }
     return true;

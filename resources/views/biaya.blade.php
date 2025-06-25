@@ -149,7 +149,7 @@
 
             <div class="mb-4">
                 <label for="tanggal" class="block text-sm font-medium">Tanggal</label>
-                <input type="date" name="tanggal" id="tanggal" class="w-full border rounded px-3 py-2" required value="{{ date('Y-m-d') }}">
+                <input type="date" name="tanggal" id="tanggal" class="w-full border rounded px-3 py-2" required value="{{ request('tanggal_akhir', date('Y-m-d')) }}">
             </div>
 
             <div class="mb-4">
@@ -175,7 +175,7 @@
                     <script>
                         // Otomatis buka modal jika ada error
                         window.addEventListener('DOMContentLoaded', () => {
-                            toggleModal();
+                            updateActionButtons(); // supaya tombol Tambah muncul saat load awal
                         });
                     </script>
                 @enderror
@@ -203,9 +203,23 @@
         <button id="confirmDeleteNo" class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400">Tidak</button>
         </div>
     </div>
+</div>
+
+<!-- Modal Putih -->
+<div id="custom-modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 hidden z-50">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm text-center">
+        <p id="custom-modal-message" class="text-gray-700 mb-4 text-sm"></p>
+        <button id="custom-modal-ok" class="bg-[#89E355] hover:bg-[#7ED242] text-white px-4 py-2 rounded">
+            OK
+        </button>
     </div>
+</div>
+
+
 
 <script>
+    const isAdmin = @json(session('user') && session('user')->status === 'admin');
+
 function toggleModal() {
     document.getElementById('modalForm').classList.toggle('hidden');
 }
@@ -237,9 +251,10 @@ const biayaData = {
     @endforeach
 };
 
+
 function editBiaya(nobiaya) {
     if (!biayaData[nobiaya]) {
-        alert('Data biaya tidak ditemukan!');
+        showModalAlert('Data biaya tidak ditemukan!');
         return;
     }
 
@@ -259,36 +274,42 @@ function editBiaya(nobiaya) {
     toggleModal();
 }
 
+
+
+
 function updateActionButtons() {
     const checkboxes = document.querySelectorAll('.item-checkbox');
     const selected = Array.from(checkboxes).filter(cb => cb.checked);
 
-    checkboxes.forEach(cb => {
-        cb.classList.remove('accent-green-500', 'accent-gray-400');
-        cb.classList.add(cb.checked ? 'accent-green-500' : 'accent-gray-400');
-    });
-
     const container = document.getElementById('actionButtons');
-    container.innerHTML = '';
+    container.innerHTML = ''; // kosongkan dulu
 
-    if (selected.length === 1) {
-        container.innerHTML = `
-            <button onclick="editBiaya('${selected[0].value}')" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Edit</button>
-            <button onclick="hapusBiaya()" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 ml-2">Hapus</button>
-        `;
-    } else if (selected.length > 1) {
-        container.innerHTML = `
-            <button onclick="hapusBiaya()" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Hapus</button>
-        `;
-    } else {
+    // 💡 Semua user bisa Tambah jika tidak ada yang dicentang
+    if (selected.length === 0) {
         container.innerHTML = `
             <button onclick="openModalForAdd()" class="bg-[#89E355] text-white px-4 py-2 rounded hover:bg-[#7ED242]">Tambah +</button>
         `;
+        return; // selesai
+    }
+
+    // 💡 Kalau admin dan ada data terpilih, bisa edit/hapus
+    if (isAdmin) {
+        if (selected.length === 1) {
+            container.innerHTML = `
+                <button onclick="editBiaya('${selected[0].value}')" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Edit</button>
+                <button onclick="hapusBiaya()" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 ml-2">Hapus</button>
+            `;
+        } else {
+            container.innerHTML = `
+                <button onclick="hapusBiaya()" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Hapus</button>
+            `;
+        }
     }
 }
 
+
 function showConfirmDelete(message) {
-  return new Promise((resolve) => {
+    return new Promise((resolve) => {
     const modal = document.getElementById('confirmDeleteModal');
     const msgElem = document.getElementById('confirmDeleteMessage');
     const btnYes = document.getElementById('confirmDeleteYes');
@@ -318,13 +339,27 @@ function showConfirmDelete(message) {
     });
     }
 
+    function showModalAlert(message, callbackOk = null) {
+        const modal = document.getElementById('custom-modal');
+        const msgContainer = document.getElementById('custom-modal-message');
+        const okBtn = document.getElementById('custom-modal-ok');
+
+        msgContainer.textContent = message;
+        modal.classList.remove('hidden');
+
+        okBtn.onclick = () => {
+            modal.classList.add('hidden');
+            if (typeof callbackOk === 'function') callbackOk();
+        };
+    }
+
     async function hapusBiaya() {
     const selected = Array.from(document.querySelectorAll('.item-checkbox'))
         .filter(cb => cb.checked)
         .map(cb => cb.value);
 
     if (selected.length === 0) {
-        alert('Pilih data yang akan dihapus terlebih dahulu.');
+        showModalAlert('Pilih data yang akan dihapus terlebih dahulu.');
         return;
     }
 
@@ -352,7 +387,7 @@ function showConfirmDelete(message) {
             checkbox.closest('tr').remove();
         }
         } catch (error) {
-        alert(`Error hapus ${nobiaya}: ${error.message}`);
+        showModalAlert(`Error hapus ${nobiaya}: ${error.message}`);
         }
     }
 

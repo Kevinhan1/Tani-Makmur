@@ -97,6 +97,67 @@ class PembelianController extends Controller
         return $prefix . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
     }
 
+
+    public function getHistory()
+    {
+        $data = DB::table('thbeli')
+            ->join('tpemasok', 'thbeli.kodepemasok', '=', 'tpemasok.kodepemasok')
+            ->select(
+                'thbeli.notabeli',
+                'thbeli.tanggal',
+                'thbeli.total',
+                'thbeli.totalbayar',
+                'tpemasok.namapemasok'
+            )
+            ->orderByDesc('thbeli.tanggal')
+            ->get();
+
+        return response()->json($data);
+    }
+
+    public function deleteHistory(Request $request)
+    {
+        $request->validate([
+            'notabeli' => 'required',
+        ]);
+
+        $notabeli = $request->notabeli;
+
+        // Cek apakah nota ada dan belum dibayar
+        $hbeli = DB::table('thbeli')->where('notabeli', $notabeli)->first();
+        if (!$hbeli) {
+            return response()->json(['success' => false, 'message' => 'Nota tidak ditemukan.']);
+        }
+
+        if ($hbeli->totalbayar > 0) {
+            return response()->json(['success' => false, 'message' => 'Nota sudah memiliki pembayaran.']);
+        }
+
+        // Cek semua detail, pastikan qtyjual = 0 semua
+        $adaJual = DB::table('tdbeli')
+            ->where('notabeli', $notabeli)
+            ->where('qtyjual', '>', 0)
+            ->exists();
+
+        if ($adaJual) {
+            return response()->json(['success' => false, 'message' => 'Data sudah dijual, tidak dapat dihapus.']);
+        }
+
+        DB::beginTransaction();
+        try {
+            DB::table('tdbeli')->where('notabeli', $notabeli)->delete();
+            DB::table('thbeli')->where('notabeli', $notabeli)->delete();
+
+            DB::commit();
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+        }
+    }
+
+
+
         public function cetakInvoice($notabeli)
     {
         $hbeli = Hbeli::with('pemasok')->where('notabeli', $notabeli)->first();

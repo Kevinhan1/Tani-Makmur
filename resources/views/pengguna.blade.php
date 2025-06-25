@@ -36,7 +36,7 @@
   </table>
 </div>
 
-<!-- Modal Tam & Edit -->
+<!-- Modal Tambah & Edit -->
 <div id="modalForm" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden z-50">
   <div class="bg-white p-6 rounded shadow-lg w-full max-w-md">
     <h3 id="modalTitle" class="text-xl font-semibold mb-4">Tambah Pengguna</h3>
@@ -97,6 +97,16 @@
   </div>
 </div>
 
+<!-- Modal Putih -->
+<div id="custom-modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 hidden z-50">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm text-center">
+        <p id="custom-modal-message" class="text-gray-700 mb-4 text-sm"></p>
+        <button id="custom-modal-ok" class="bg-[#89E355] hover:bg-[#7ED242] text-white px-4 py-2 rounded">
+            OK
+        </button>
+    </div>
+</div>
+
 <script>
   window.addEventListener('DOMContentLoaded', () => {
     @if ($errors->any())
@@ -143,7 +153,7 @@ const penggunaData = {
 
 function editPengguna(id) {
   const data = penggunaData[id];
-  if (!data) return alert('Data pengguna tidak ditemukan!');
+  if (!data) return showModalAlert('Data pengguna tidak ditemukan!');
   document.getElementById('modalTitle').innerText = 'Edit Pengguna';
   document.getElementById('formData').action = "/pengguna/" + id;
   document.getElementById('formMethod').value = 'PUT';
@@ -170,13 +180,27 @@ function updateActionButtons() {
   }
 }
 
+function showModalAlert(message, callbackOk = null) {
+    const modal = document.getElementById('custom-modal');
+    const msgContainer = document.getElementById('custom-modal-message');
+    const okBtn = document.getElementById('custom-modal-ok');
+
+    msgContainer.textContent = message;
+    modal.classList.remove('hidden');
+
+    okBtn.onclick = () => {
+        modal.classList.add('hidden');
+        if (typeof callbackOk === 'function') callbackOk();
+    };
+}
+
 async function hapusPengguna() {
   const sel = Array.from(document.querySelectorAll('.item-checkbox')).filter(cb => cb.checked).map(cb=>cb.value);
-  if (sel.length === 0) return alert('Pilih data yang akan dihapus.');
+  if (sel.length === 0) return showModalAlert('Pilih data yang akan dihapus.');
   if (!await showConfirmDelete(`Apakah Anda yakin ingin menghapus ${sel.length} data?`)) return;
 
   for (let id of sel) {
-    await fetch(`/pengguna/${id}`, {
+    await fetch(`/pengguna+/${id}`, {
       method: 'DELETE',
       headers: {
         'X-CSRF-TOKEN': '{{ csrf_token() }}',

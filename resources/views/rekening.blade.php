@@ -17,13 +17,14 @@
         </form>
 
         
-        <div id="actionButtons">
-            <button onclick="openModalForAdd()" class="bg-[#89E355] text-white px-4 py-2 rounded hover:bg-[#7ED242]">
-                Tambah +
-            </button>
-        </div>
+        
 
         <div class="flex items-center mr-5 gap-0 space-x-2 text-sm text-gray-700">
+                    <div id="actionButtons">
+                        <button onclick="openModalForAdd()" class="bg-[#89E355] text-white px-4 py-2 rounded hover:bg-[#7ED242]">
+                            Tambah +
+                        </button>
+                    </div>
             <!-- Label Halaman -->
             <span>
                 Halaman {{ $rekening->currentPage() }} dari {{ $rekening->lastPage() }}
@@ -174,7 +175,7 @@ const rekeningData = {
 
 function editRekening(kode) {
     const data = rekeningData[kode];
-    if (!data) return alert('Data tidak ditemukan!');
+    if (!data) return showModalAlert('Data tidak ditemukan!');
 
     document.getElementById('modalTitle').innerText = 'Edit Rekening';
     document.getElementById('formDataRekening').action = "/rekening/" + kode;
@@ -237,12 +238,26 @@ function showConfirmDelete(message) {
     });
 }
 
+function showModalAlert(message, callbackOk = null) {
+    const modal = document.getElementById('custom-modal');
+    const msgContainer = document.getElementById('custom-modal-message');
+    const okBtn = document.getElementById('custom-modal-ok');
+
+    msgContainer.textContent = message;
+    modal.classList.remove('hidden');
+
+    okBtn.onclick = () => {
+        modal.classList.add('hidden');
+        if (typeof callbackOk === 'function') callbackOk();
+    };
+}
+
 async function hapusRekening() {
     const selected = Array.from(document.querySelectorAll('.item-checkbox'))
         .filter(cb => cb.checked)
         .map(cb => cb.value);
 
-    if (selected.length === 0) return alert('Pilih data yang akan dihapus.');
+    if (selected.length === 0) return showModalAlert('Pilih data yang akan dihapus.');
 
     const confirmed = await showConfirmDelete(`Apakah Anda yakin ingin menghapus ${selected.length} data?`);
     if (!confirmed) return;
@@ -263,7 +278,7 @@ async function hapusRekening() {
             const checkbox = document.querySelector(`.item-checkbox[value="${kode}"]`);
             if (checkbox) checkbox.closest('tr').remove();
         } catch (error) {
-            alert(`Gagal menghapus ${kode}: ${error.message}`);
+            showModalAlert(`Gagal menghapus ${kode}: ${error.message}`);
         }
     }
 

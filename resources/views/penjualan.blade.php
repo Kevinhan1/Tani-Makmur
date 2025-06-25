@@ -9,6 +9,9 @@
     <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-semibold">Nota Penjualan</h2>
         <div id="actionButtons">
+            <button id="btn-history" type="button" class="bg-gray-200 text-gray px-4 py-2 rounded hover:bg-gray-300 mr-2">
+                History Penjualan
+            </button>
             <button id="simpan-semua" type="button" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mr-2">
                 Simpan
             </button>
@@ -119,11 +122,47 @@
     </div>
 </div>
 
+
+<!-- Modal History Penjualan -->
+<div id="modal-history" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
+    <div class="bg-white w-full max-w-4xl rounded-lg p-6 shadow-lg">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold">Riwayat Penjualan</h3>
+            <button onclick="toggleHistory(false)" class="text-gray-500 hover:text-black">&times;</button>
+        </div>
+        <div class="relative mb-4">
+            <input type="text" id="search-history" class="w-full border px-4 py-2 rounded" placeholder="Cari berdasarkan No Nota" oninput="filterHistory()">
+            <svg class="absolute right-3 top-3 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M21 21l-6-6M11 19a8 8 0 100-16 8 8 0 000 16z"/>
+            </svg>
+        </div>
+        <div class="overflow-y-auto max-h-[400px]">
+            <table class="w-full text-sm text-left border">
+                <thead class="bg-gray-100 text-gray-700 ">
+                    <tr>
+                        <th class="px-4 py-2 font-normal">Nota</th>
+                        <th class="px-4 py-2 font-normal">Tanggal</th>
+                        <th class="px-4 py-2 font-normal">Pelanggan</th>
+                        <th class="px-4 py-2 text-center font-normal">Total</th>
+                        <th class="px-4 py-2 text-center font-normal">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="history-body"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+
 <!-- Modal Alert -->
 <div id="custom-modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 hidden z-50">
     <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm text-center">
         <p id="custom-modal-message" class="text-gray-700 mb-4 text-sm"></p>
-        <button id="custom-modal-ok" class="bg-[#89E355] hover:bg-[#7ED242] text-white px-4 py-2 rounded">OK</button>
+        <button id="custom-modal-ok" class="bg-[#89E355] hover:bg-[#7ED242] text-white px-4 py-2 rounded">
+            OK
+        </button>
     </div>
 </div>
 
@@ -178,7 +217,7 @@ document.getElementById('simpan-barang').onclick = () => {
     const qty = parseFloat(document.getElementById('qtyjual').value);
 
     if (!noref || !qty || !hargajual || !namabarang || !konversi) {
-        return alert("Isi semua data dengan benar!");
+        return showModalAlert("Isi semua data dengan benar!");
     }
 
     const qtyton = (qty * konversi) / 1000;
@@ -309,6 +348,77 @@ function showModalAlert(message, callback) {
         }
     });
 }
+
+document.getElementById('btn-history').onclick = () => {
+    loadHistory();
+    toggleHistory(true);
+};
+
+function toggleHistory(show = true) {
+    document.getElementById('modal-history').classList.toggle('hidden', !show);
+}
+
+function loadHistory() {
+    fetch("{{ url('/api/history-penjualan') }}")
+    .then(res => res.json())
+    .then(data => {
+        const tbody = document.getElementById('history-body');
+        tbody.innerHTML = '';
+        data.forEach(row => {
+            const tr = document.createElement('tr');
+            tr.classList.add('border-b');
+            tr.innerHTML = `
+                <td class="px-4 py-2">${row.notajual}</td>
+                <td class="px-4 py-2">${row.tanggal}</td>
+                <td class="px-4 py-2">${row.namapelanggan}</td>
+                <td class="px-4 py-2 text-center">Rp ${formatRupiah(row.total)}</td>
+                <td class="px-4 py-2 text-center">
+                    <div class="flex flex-col gap-1">
+                        <a href="/penjualan/${row.notajual}/invoice" target="_blank"
+                        class=" border border-gray-300 bg-white-500 hover:bg-white-600 text-black text-xs px-2 py-1 rounded text-center">
+                            Invoice
+                        </a>
+                        <button onclick="hapusHistory('${row.notajual}')"
+                        class="bg-red-500 hover:bg-red-600 text-white text-xs px-2 py-1 rounded text-center">
+                            Hapus
+                        </button>
+                    </div>
+                </td>`;
+            tbody.appendChild(tr);
+        });
+    });
+}
+
+function filterHistory() {
+    const search = document.getElementById('search-history').value.toLowerCase();
+    document.querySelectorAll('#history-body tr').forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(search) ? '' : 'none';
+    });
+}
+
+function hapusHistory(notajual) {
+    showModalAlert(`Yakin ingin menghapus nota ${notajual}?`, () => {
+        fetch('/api/history-penjualan/delete', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ notajual })
+        })
+        .then(res => res.json())
+        .then(res => {
+            if (res.success) {
+                loadHistory();
+            } else {
+                showModalAlert(res.message || 'Gagal menghapus data');
+            }
+        });
+    });
+}
+
+
 
 // Optional versi pendek
 function showModal(msg) {

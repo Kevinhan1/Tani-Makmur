@@ -177,7 +177,7 @@ class BiayaController extends Controller
             'search' => $request->search,
         ])->setPaper('A4', 'portrait');
 
-        return $pdf->stream('biaya-' . now()->format('Ymd_His') . '.pdf');
+        return $pdf->stream('biaya-' . now()->format('Ymd-His') . '.pdf');
     }
 
 

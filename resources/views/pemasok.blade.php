@@ -18,13 +18,13 @@
         </form>
 
         
-        <div id="actionButtons">
-            <button onclick="openModalForAdd()" class="bg-[#89E355] text-white px-4 py-2 rounded hover:bg-[#7ED242]">
-                Tambah +
-            </button>
-        </div>
 
         <div class="flex items-center space-x-2 text-sm text-gray-700">
+                <div id="actionButtons">
+                    <button onclick="openModalForAdd()" class="bg-[#89E355] text-white px-4 py-2 rounded hover:bg-[#7ED242]">
+                        Tambah +
+                    </button>
+                </div>
             <!-- Label Halaman -->
             <span>
                 Halaman {{ $pemasok->currentPage() }} dari {{ $pemasok->lastPage() }}
@@ -144,6 +144,16 @@
   </div>
 </div>
 
+<!-- Modal Putih Alert -->
+<div id="custom-modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 hidden z-50">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm text-center">
+        <p id="custom-modal-message" class="text-gray-700 mb-4 text-sm"></p>
+        <button id="custom-modal-ok" class="bg-[#89E355] hover:bg-[#7ED242] text-white px-4 py-2 rounded">
+            OK
+        </button>
+    </div>
+</div>
+
 <script>
 function toggleModal() {
     document.getElementById('modalForm').classList.toggle('hidden');
@@ -177,7 +187,7 @@ const pemasokData = {
 
 function editPemasok(kode) {
     if (!pemasokData[kode]) {
-        alert('Data pemasok tidak ditemukan!');
+        showModalAlert('Data pemasok tidak ditemukan!');
         return;
     }
 
@@ -257,13 +267,28 @@ function showConfirmDelete(message) {
   });
 }
 
+function showModalAlert(message, callbackOk = null) {
+    const modal = document.getElementById('custom-modal');
+    const msgContainer = document.getElementById('custom-modal-message');
+    const okBtn = document.getElementById('custom-modal-ok');
+
+    msgContainer.textContent = message;
+    modal.classList.remove('hidden');
+
+    okBtn.onclick = () => {
+        modal.classList.add('hidden');
+        if (typeof callbackOk === 'function') callbackOk();
+    };
+}
+
+
 async function hapusPemasok() {
   const selected = Array.from(document.querySelectorAll('.item-checkbox'))
     .filter(cb => cb.checked)
     .map(cb => cb.value);
 
   if (selected.length === 0) {
-    alert('Pilih data yang akan dihapus terlebih dahulu.');
+     showModalAlert('Pilih data yang akan dihapus terlebih dahulu.');
     return;
   }
 
@@ -292,7 +317,7 @@ async function hapusPemasok() {
         checkbox.closest('tr').remove();
       }
     } catch (error) {
-      alert(`Error hapus ${kode}: ${error.message}`);
+        showModalAlert(`Error hapus ${kode}: ${error.message}`);
     }
   }
 

@@ -287,11 +287,11 @@
                         <p><strong>Total Bayar:</strong> ${parseFloat(item.total).toLocaleString('id-ID')}</p>
                         <div class="mt-2 flex gap-2">
                             <button onclick="editBayar('${item.no}')" 
-                                class="bg-blue-100 text-blue-700 px-3 py-1 rounded hover:bg-blue-200 text-sm">
+                                class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm">
                                 Edit
                             </button>
                             <button onclick="hapusBayar('${item.no}')" 
-                                class="bg-red-100 text-red-700 px-3 py-1 rounded hover:bg-red-200 text-sm">
+                                class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm">
                                 Hapus
                             </button>
                         </div>

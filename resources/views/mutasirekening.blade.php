@@ -56,17 +56,6 @@
             <input type="date" name="tanggal_akhir" value="{{ request('tanggal_akhir', date('Y-m-d')) }}" class="w-full border rounded px-2 py-1">
         </div>
         <div>
-            <label class="text-sm text-gray-600">Jenis</label>
-            <select name="jenis" class="w-full border rounded px-2 py-1">
-                <option value="">Semua</option>
-                <option value="Pembelian" {{ request('jenis') == 'Pembelian' ? 'selected' : '' }}>Pembelian</option>
-                <option value="Penjualan" {{ request('jenis') == 'Penjualan' ? 'selected' : '' }}>Penjualan</option>
-                <option value="Pindah Buku" {{ request('jenis') == 'Pindah Buku' ? 'selected' : '' }}>Pindah Buku</option>
-                <option value="Biaya" {{ request('jenis') == 'Biaya' ? 'selected' : '' }}>Biaya</option>
-                <option value="Saldo Manual" {{ request('jenis') == 'Saldo Manual' ? 'selected' : '' }}>Saldo Manual</option>
-            </select>
-        </div>
-        <div>
             <label class="text-sm text-gray-600">Rekening</label>
             <select name="rekening" class="w-full border rounded px-2 py-1">
                 <option value="">Semua</option>
@@ -75,6 +64,18 @@
                         {{ $rek->namarekening }}
                     </option>
                 @endforeach
+            </select>
+
+        </div>
+        <div>
+                        <label class="text-sm text-gray-600">Jenis</label>
+            <select name="jenis" class="w-full border rounded px-2 py-1">
+                <option value="">Semua</option>
+                <option value="Pembelian" {{ request('jenis') == 'Pembelian' ? 'selected' : '' }}>Pembelian</option>
+                <option value="Penjualan" {{ request('jenis') == 'Penjualan' ? 'selected' : '' }}>Penjualan</option>
+                <option value="Pindah Buku" {{ request('jenis') == 'Pindah Buku' ? 'selected' : '' }}>Pindah Buku</option>
+                <option value="Biaya" {{ request('jenis') == 'Biaya' ? 'selected' : '' }}>Biaya</option>
+                <option value="Saldo Manual" {{ request('jenis') == 'Saldo Manual' ? 'selected' : '' }}>Saldo Manual</option>
             </select>
         </div>
         <div class="flex items-end">

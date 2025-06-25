@@ -29,12 +29,19 @@
 		@page {
 			margin: 1cm 0.3cm; /* atas/bawah 1cm, kanan/kiri 2cm */				
         }
+        .text-green {
+            color: green;
+        }
+        .text-red {
+            color: red;
+        }
     </style>
 </head>
 <body>
     <h2 style="text-align: center;">Laporan Mutasi Rekening</h2>
     <p>Periode: {{ \Carbon\Carbon::parse($tanggalAwal)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($tanggalAkhir)->format('d/m/Y') }}</p>
     <p>Jenis: {{ request('jenis') ?? 'Semua' }}</p>
+    <p>Rekening: {{ $rekeningNama ?? 'Semua' }}</p>
 
     <table>
         <thead>
@@ -58,9 +65,9 @@
                 <td>{{ $item->nogenerate }}</td>
                 <td>{{ $item->noreferensi }}</td>
                 <td>{{ $item->rekening->namarekening ?? '-' }}</td>
-                <td>Rp{{ number_format($item->masuk, 0, ',', '.') }}</td>
-                <td>Rp{{ number_format($item->keluar, 0, ',', '.') }}</td>
                 <td>{{ $item->jenis }}</td>
+                <td class="text-green" >Rp{{ number_format($item->masuk, 0, ',', '.') }}</td>
+                <td class="text-red" >Rp{{ number_format($item->keluar, 0, ',', '.') }}</td>
                 <td>{{ $item->keterangan }}</td>
             </tr>
             @empty

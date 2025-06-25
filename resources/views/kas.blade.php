@@ -14,29 +14,29 @@
             @if ($kas->onFirstPage())
                 <span class="px-2 py-1 border border-gray-400 text-gray-400 rounded font-bold cursor-not-allowed">
                     <svg class="w-4 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-																								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
-																				</svg>
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
+					</svg>
                 </span>
             @else
                 <svg class="w-4 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-																				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
-																</svg>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
+                </svg>
                 </a>
             @endif
 
             {{-- Pagination kanan --}}
             @if ($kas->hasMorePages())
                 <a href="{{ $kas->nextPageUrl() }}"
-                   class="px-2 py-1 border border-gray-700 text-gray-800 rounded hover:bg-gray-100 font-bold">
+                    class="px-2 py-1 border border-gray-700 text-gray-800 rounded hover:bg-gray-100 font-bold">
                     <svg class="w-4 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-																								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
-																				</svg>
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
+					</svg>
                 </a>
             @else
                 <span class="px-2 py-1 border border-gray-400 text-gray-400 rounded font-bold cursor-not-allowed">
                     <svg class="w-4 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-																								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
-																				</svg>
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
+					</svg>
                 </span>
             @endif
         </div>
@@ -46,11 +46,13 @@
     <form method="GET" action="{{ route('kas.index') }}" class="grid grid-cols-1 md:grid-cols-6 gap-4 mb-6">
         <div>
             <label class="text-sm text-gray-600">Tanggal Awal</label>
-            <input type="date" name="tanggal_awal" value="{{ request('tanggal_awal') }}" class="w-full border rounded px-2 py-1">
+            <input type="date" name="tanggal_awal" value="{{ request('tanggal_awal', date('Y-m-d', strtotime('-7 days'))) }}"
+            class="w-full border rounded px-2 py-1">
         </div>
         <div>
             <label class="text-sm text-gray-600">Tanggal Akhir</label>
-            <input type="date" name="tanggal_akhir" value="{{ request('tanggal_akhir') }}" class="w-full border rounded px-2 py-1">
+            <input type="date" name="tanggal_akhir" value="{{ request('tanggal_akhir', date('Y-m-d')) }}"
+            class="w-full border rounded px-2 py-1">
         </div>
         <div>
             <label class="text-sm text-gray-600">Rekening</label>
@@ -71,6 +73,7 @@
                 <option value="Penjualan" {{ request('jenis') == 'Penjualan' ? 'selected' : '' }}>Penjualan</option>
                 <option value="Pindah Buku" {{ request('jenis') == 'Pindah Buku' ? 'selected' : '' }}>Pindah Buku</option>
                 <option value="Biaya" {{ request('jenis') == 'Biaya' ? 'selected' : '' }}>Biaya</option>
+                <option value="Saldo Manual" {{ request('jenis') == 'Saldo Manual' ? 'selected' : '' }}>Saldo Manual</option>
             </select>
         </div>
         <div class="flex items-end">
@@ -78,7 +81,7 @@
         </div>
         <div class="flex items-end">
             <a href="{{ route('kas.pdf', request()->all()) }}" target="_blank"
-               class="flex gap-2 justify-center rounded border border-gray-300 bg-gray-100 text-sm text-gray px-4 py-2 hover:bg-gray-400 w-full">
+                class="flex gap-2 justify-center rounded border border-gray-300 bg-gray-100 text-sm text-gray px-4 py-2 hover:bg-gray-400 w-full">
                 <span>Print PDF</span>
                 <img src="{{ asset('icons/printer.svg') }}" class="w-5 h-5" alt="Print Icon">
             </a>
@@ -87,17 +90,20 @@
 
     {{-- Saldo Awal dan Akhir --}}
     <div class="flex justify-end text-sm text-gray-700 mb-2">
-        <div class="text-right">
-            <p>Saldo Awal: <span class="font-semibold text-green-700">Rp{{ number_format($saldoAwal ?? 0, 0, ',', '.') }}</span></p>
+    <div class="text-right">
+            <p>Saldo Awal:
+                <span class="font-semibold text-green-700">
+                    Rp{{ number_format($saldoAwal ?? 0, 0, ',', '.') }}
+                </span>
+            </p>
             <p>Saldo Akhir:
                 <span class="font-semibold text-blue-700">
-                    Rp{{ number_format(($saldoAwal ?? 0) + $kas->sum('masuk') - $kas->sum('keluar'), 0, ',', '.') }}
+                    Rp{{ number_format($saldoRekening ?? 0, 0, ',', '.') }}
                 </span>
             </p>
         </div>
     </div>
 
-    {{-- Tabel Kas --}}
     {{-- Tabel Kas --}}
 <div>
     <table class="w-full text-left border-collapse">
@@ -115,25 +121,26 @@
         </thead>
         <tbody>
             @php $saldo = $saldoAwal ?? 0; @endphp
-            @forelse ($kas as $item)
-                @php
-                    $saldo += ($item->masuk - $item->keluar);
-                @endphp
-                <tr class="border-t">
-                    <td class="px-4 py-2">{{ \Carbon\Carbon::parse($item->tanggal)->format('d-m-Y') }}</td>
-                    <td class="px-4 py-2">{{ $item->nogenerate }}</td>
-                    <td class="px-4 py-2">{{ $item->noreferensi }}</td>
-                    <td class="px-4 py-2">{{ $item->keterangan }}</td>
-                    <td class="px-4 py-2">{{ $item->jenis }}</td>
-                    <td class="px-4 py-2 text-green-600">Rp{{ number_format($item->masuk, 0, ',', '.') }}</td>
-                    <td class="px-4 py-2 text-red-600">Rp{{ number_format($item->keluar, 0, ',', '.') }}</td>
-                    <td class="px-4 py-2 ">Rp{{ number_format($saldo, 0, ',', '.') }}</td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="8" class="text-center text-gray-500 py-4">Tidak ada data kas.</td>
-                </tr>
-            @endforelse
+                @forelse ($kas as $item)
+                    @php
+                        $saldo += $item->masuk;
+                        $saldo -= $item->keluar;
+                    @endphp
+                    <tr class="border-t">
+                        <td class="px-4 py-2">{{ \Carbon\Carbon::parse($item->tanggal)->format('d-m-Y') }}</td>
+                        <td class="px-4 py-2">{{ $item->nogenerate }}</td>
+                        <td class="px-4 py-2">{{ $item->noreferensi }}</td>
+                        <td class="px-4 py-2">{{ $item->keterangan }}</td>
+                        <td class="px-4 py-2">{{ $item->jenis }}</td>
+                        <td class="px-4 py-2 text-green-600">Rp{{ number_format($item->masuk, 0, ',', '.') }}</td>
+                        <td class="px-4 py-2 text-red-600">Rp{{ number_format($item->keluar, 0, ',', '.') }}</td>
+                        <td class="px-4 py-2">Rp{{ number_format($saldo, 0, ',', '.') }}</td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="8" class="text-center text-gray-500 py-4">Tidak ada data kas.</td>
+                    </tr>
+                @endforelse
         </tbody>
     </table>
 </div>

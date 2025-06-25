@@ -22,13 +22,14 @@
         </form>
 
         
-        <div id="actionButtons">
-            <button onclick="openModalForAdd()" class="bg-[#89E355] text-white px-4 py-2 rounded hover:bg-[#7ED242]">
-                Tambah +
-            </button>
-        </div>
+        
 
             <div class="flex items-center mr-5 gap-0 space-x-2 text-sm text-gray-700">
+                <div id="actionButtons">
+                    <button onclick="openModalForAdd()" class="bg-[#89E355] text-white px-4 py-2 rounded hover:bg-[#7ED242]">
+                        Tambah +
+                    </button>
+                </div>
             <!-- Label Halaman -->
             <span>
                 Halaman {{ $pelanggan->currentPage() }} dari {{ $pelanggan->lastPage() }}
@@ -204,6 +205,18 @@
     </div>
 </div>
 
+
+
+<!-- Modal Putih Alert -->
+<div id="custom-modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 hidden z-50">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm text-center">
+        <p id="custom-modal-message" class="text-gray-700 mb-4 text-sm"></p>
+        <button id="custom-modal-ok" class="bg-[#89E355] hover:bg-[#7ED242] text-white px-4 py-2 rounded">
+            OK
+        </button>
+    </div>
+</div>
+
 <script>
 
 function revealSensitive(id, ktp, npwp, nitku) {
@@ -244,7 +257,7 @@ const pelangganData = {
 
 function editPelanggan(kode) {
     const data = pelangganData[kode];
-    if (!data) return alert('Data tidak ditemukan');
+    if (!data) return  showModalAlert('Data tidak ditemukan');
 
     document.getElementById('modalTitle').innerText = 'Edit Pelanggan';
     document.getElementById('formDataPelanggan').action = "/pelanggan/" + kode;
@@ -318,12 +331,26 @@ function showConfirmDelete(message) {
     });
 }
 
+function showModalAlert(message, callbackOk = null) {
+    const modal = document.getElementById('custom-modal');
+    const msgContainer = document.getElementById('custom-modal-message');
+    const okBtn = document.getElementById('custom-modal-ok');
+
+    msgContainer.textContent = message;
+    modal.classList.remove('hidden');
+
+    okBtn.onclick = () => {
+        modal.classList.add('hidden');
+        if (typeof callbackOk === 'function') callbackOk();
+    };
+}
+
 async function hapusPelanggan() {
     const selected = Array.from(document.querySelectorAll('.item-checkbox'))
         .filter(cb => cb.checked)
         .map(cb => cb.value);
 
-    if (selected.length === 0) return alert('Pilih data terlebih dahulu.');
+    if (selected.length === 0) return showModalAlert('Pilih data terlebih dahulu.');
 
     const confirmed = await showConfirmDelete(`Apakah Anda yakin ingin menghapus ${selected.length} data?`);
     if (!confirmed) return;
@@ -344,7 +371,7 @@ async function hapusPelanggan() {
             const row = document.querySelector(`.item-checkbox[value="${kode}"]`)?.closest('tr');
             if (row) row.remove();
         } catch (error) {
-            alert(`Gagal menghapus ${kode}: ${error.message}`);
+            showModalAlert(`Gagal menghapus ${kode}: ${error.message}`);
         }
     }
 

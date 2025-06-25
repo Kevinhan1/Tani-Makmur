@@ -199,6 +199,6 @@ public function update(Request $request, $nopindahbuku)
             'tanggal_akhir' => $tanggal_akhir,
         ])->setPaper('a4', 'potrait');
 
-        return $pdf->stream('laporan-pindah-saldo -'. now()->format('Ymd_His') . '.pdf');
+        return $pdf->stream('laporan-pindah-saldo -'. now()->format('Ymd-His') . '.pdf');
     }
 }

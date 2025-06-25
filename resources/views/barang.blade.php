@@ -18,14 +18,16 @@
         </form>
 
         
-        <div id="actionButtons">
-            <button onclick="openModalForAdd()" class="bg-[#89E355] text-white px-4 py-2 rounded hover:bg-[#7ED242]">
-                Tambah +
-            </button>
-        </div>
+        
 
         <div class="flex items-center mr-5 gap-0 space-x-2 text-sm text-gray-700">
         <!-- Label Halaman -->
+
+            <div id="actionButtons">
+                <button onclick="openModalForAdd()" class="bg-[#89E355] text-white px-4 py-2 rounded hover:bg-[#7ED242]">
+                    Tambah +
+                </button>
+            </div>
         <span>
             Halaman {{ $barang->currentPage() }} dari {{ $barang->lastPage() }}
         </span>
@@ -163,7 +165,15 @@
     </div>
     </div>
 
-
+<!-- Modal Putih Alert -->
+<div id="custom-modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 hidden z-50">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm text-center">
+        <p id="custom-modal-message" class="text-gray-700 mb-4 text-sm"></p>
+        <button id="custom-modal-ok" class="bg-[#89E355] hover:bg-[#7ED242] text-white px-4 py-2 rounded">
+            OK
+        </button>
+    </div>
+</div>
 
 <script>
 function toggleModal() {
@@ -206,7 +216,7 @@ const barangData = {
 // Buka modal edit dan isi data form
 function editBarang(kode) {
     if (!barangData[kode]) {
-        alert('Data barang tidak ditemukan!');
+        showModalAlert('Data barang tidak ditemukan!');
         return;
     }
 
@@ -290,13 +300,27 @@ function showConfirmDelete(message) {
   });
 }
 
+    function showModalAlert(message, callbackOk = null) {
+        const modal = document.getElementById('custom-modal');
+        const msgContainer = document.getElementById('custom-modal-message');
+        const okBtn = document.getElementById('custom-modal-ok');
+
+        msgContainer.textContent = message;
+        modal.classList.remove('hidden');
+
+        okBtn.onclick = () => {
+            modal.classList.add('hidden');
+            if (typeof callbackOk === 'function') callbackOk();
+        };
+    }
+
 async function hapusBarang() {
   const selected = Array.from(document.querySelectorAll('.item-checkbox'))
     .filter(cb => cb.checked)
     .map(cb => cb.value);
 
   if (selected.length === 0) {
-    alert('Pilih data yang akan dihapus terlebih dahulu.');
+    showModalAlert('Pilih data yang akan dihapus terlebih dahulu.');
     return;
   }
 
@@ -325,7 +349,7 @@ async function hapusBarang() {
         checkbox.closest('tr').remove();
       }
     } catch (error) {
-      alert(`Error hapus ${kode}: ${error.message}`);
+      showModalAlert(`Error hapus ${kode}: ${error.message}`);
     }
   }
 
