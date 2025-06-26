@@ -4,9 +4,51 @@
 @section('page', 'Pembayaran Penjualan')
 
 @section('content')
-<div class="bg-white p-6 rounded shadow" style="min-height: 600px;">
-    <div class="mb-4">
+<div class="bg-white p-6 rounded shadow" style="min-height: 800px;">
+        <div class="flex justify-between items-center mb-4">
         <h2 class="text-2xl font-semibold mb-2">Data Pembayaran Penjualan</h2>
+
+        <div class="flex items-center gap-4 text-sm text-gray-700">
+
+        @if ($notajuals instanceof \Illuminate\Pagination\LengthAwarePaginator && $notajuals->count())
+                <span>Halaman {{ $notajuals->currentPage() }} dari {{ $notajuals->lastPage() }}</span>
+
+                {{-- Panah kiri --}}
+                @if ($notajuals->onFirstPage())
+                    <span class="px-2 py-1 border border-gray-400 text-gray-400 rounded font-bold cursor-not-allowed">
+                        <svg class="w-4 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </span>
+                @else
+                    <a href="{{ request()->fullUrlWithQuery(['page' => $notajuals->currentPage() - 1]) }}"
+                        class="px-2 py-1 border border-gray-700 text-gray-800 rounded hover:bg-gray-100 font-bold">
+                        <svg class="w-4 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </a>
+                @endif
+
+                {{-- Panah kanan --}}
+                @if ($notajuals->hasMorePages())
+                    <a href="{{ request()->fullUrlWithQuery(['page' => $notajuals->currentPage() + 1]) }}"
+                        class="px-2 py-1 border border-gray-700 text-gray-800 rounded hover:bg-gray-100 font-bold">
+                        <svg class="w-4 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </a>
+                @else
+                    <span class="px-2 py-1 border border-gray-400 text-gray-400 rounded font-bold cursor-not-allowed">
+                        <svg class="w-4 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </span>
+                @endif
+            @endif
+        </div>
+    </div>
+
+
 
         {{-- Filter Form --}}
         <form id="filterForm" method="GET" action="{{ route('pembayaran-penjualan.index') }}" class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">

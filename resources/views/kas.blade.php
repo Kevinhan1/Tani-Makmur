@@ -18,11 +18,13 @@
 					</svg>
                 </span>
             @else
-                <svg class="w-4 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <a href="{{ request()->fullUrlWithQuery(['page' => $kas->currentPage() - 1]) }}"
+                        class="px-2 py-1 border border-gray-700 text-gray-800 rounded hover:bg-gray-100 font-bold">
+                        <svg class="w-4 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
-                </svg>
-                </a>
-            @endif
+                        </svg>
+                    </a>
+                @endif
 
             {{-- Pagination kanan --}}
             @if ($kas->hasMorePages())

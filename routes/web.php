@@ -85,7 +85,7 @@ Route::resource('pindahsaldo', PindahSaldoController::class);
 // Pembelian
 Route::resource('/pembelian', PembelianController::class);
 Route::get('/pembelian/{notabeli}/invoice', [PembelianController::class, 'cetakInvoice']);
-Route::get('/api/history-pembelian', [PembelianController::class, 'getHistory']);
+Route::get('api/history-pembelian', [PembelianController::class, 'getHistory']);
 Route::post('/api/history-pembelian/delete', [PembelianController::class, 'deleteHistory']);
 
 

@@ -46,8 +46,7 @@ class PembayaranPembelianController extends Controller
             $query->where('notabeli', 'like', '%' . $request->notabeli . '%');
         }
 
-        $notabelis = $query->orderBy('tanggal', 'desc')->get();
-
+        $notabelis = $query->orderBy('tanggal', 'desc')->paginate(15)->withQueryString();
         $rekeningAktif = Rekening::where('aktif', 1)->get();
 
         return view('pembayaran-pembelian', [

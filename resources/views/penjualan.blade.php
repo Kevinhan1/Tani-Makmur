@@ -136,8 +136,13 @@
                 <path d="M21 21l-6-6M11 19a8 8 0 100-16 8 8 0 000 16z"/>
             </svg>
         </div>
-        <div class="overflow-y-auto max-h-[400px]">
-            <table class="w-full text-sm text-left border">
+        <div class="flex justify-between items-center mt-3 text-sm text-gray-600">
+                <button id="prevPage" class="px-3 py-1 border border-gray-500 bg-gray-100 rounded hover:bg-gray-200"><</button>
+                <span id="pageIndicator">Halaman 1</span>
+                <button id="nextPage" class="px-3 py-1 border border-gray-500 bg-gray-100 rounded hover:bg-gray-200">></button>
+        </div>
+        <div class="overflow-y-auto max-h-[400px] hide-scrollbar">
+            <table class="w-full text-sm mt-3 text-left border">
                 <thead class="bg-gray-100 text-gray-700 ">
                     <tr>
                         <th class="px-4 py-2 font-normal">Nota</th>
@@ -358,13 +363,18 @@ function toggleHistory(show = true) {
     document.getElementById('modal-history').classList.toggle('hidden', !show);
 }
 
-function loadHistory() {
-    fetch("{{ url('/api/history-penjualan') }}")
+let currentPage = 1;
+
+function loadHistory(page = 1) {
+    const keyword = document.getElementById('search-history').value;
+    fetch(`/api/history-penjualan?page=${page}&limit=5&search=${encodeURIComponent(keyword)}`)
     .then(res => res.json())
     .then(data => {
         const tbody = document.getElementById('history-body');
         tbody.innerHTML = '';
-        data.forEach(row => {
+        currentPage = data.current_page;
+
+        data.data.forEach(row => {
             const tr = document.createElement('tr');
             tr.classList.add('border-b');
             tr.innerHTML = `
@@ -386,8 +396,43 @@ function loadHistory() {
                 </td>`;
             tbody.appendChild(tr);
         });
+
+        renderPagination(data);
     });
 }
+
+function renderPagination(data) {
+    const pagination = document.getElementById('pagination');
+    pagination.innerHTML = '';
+
+    if (data.last_page <= 1) return;
+
+    // Tombol Previous
+    const prev = document.createElement('button');
+    prev.textContent = '«';
+    prev.disabled = !data.prev_page_url;
+    prev.className = "px-2 py-1 border rounded";
+    prev.onclick = () => loadHistory(currentPage - 1);
+    pagination.appendChild(prev);
+
+    // Nomor halaman
+    for (let i = 1; i <= data.last_page; i++) {
+        const btn = document.createElement('button');
+        btn.textContent = i;
+        btn.className = `px-2 py-1 border rounded ${i === data.current_page ? 'bg-gray-300 font-bold' : ''}`;
+        btn.onclick = () => loadHistory(i);
+        pagination.appendChild(btn);
+    }
+
+    // Tombol Next
+    const next = document.createElement('button');
+    next.textContent = '»';
+    next.disabled = !data.next_page_url;
+    next.className = "px-2 py-1 border rounded";
+    next.onclick = () => loadHistory(currentPage + 1);
+    pagination.appendChild(next);
+}
+
 
 function filterHistory() {
     const search = document.getElementById('search-history').value.toLowerCase();

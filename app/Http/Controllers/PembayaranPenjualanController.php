@@ -37,8 +37,7 @@ class PembayaranPenjualanController extends Controller
         if ($request->filled('notajual')) {
             $query->where('notajual', 'like', '%' . $request->notajual . '%');
         }
-
-        $notajuals = $query->orderBy('tanggal', 'desc')->get();
+        $notajuals = $query->orderBy('tanggal', 'desc')->paginate(15)->withQueryString();
         $rekeningAktif = Rekening::where('aktif', 1)->get();
 
         return view('pembayaran-penjualan', compact('notajuals', 'tanggalAwal', 'tanggalAkhir', 'rekeningAktif'));

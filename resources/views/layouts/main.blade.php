@@ -29,7 +29,7 @@
 <!-- Sidebar -->
 <aside class="w-64 bg-white shadow-lg h-screen fixed flex flex-col">
     <div class="text-center text-2xl font-bold py-6 text-[#89E355] italic">Tani Makmur</div>
-    <nav class="flex-3 overflow-y-auto h-[6000vh] hide-scrollbar">
+    <nav class="flex-3 overflow-y-auto h-[10000vh] hide-scrollbar">
         <ul class="space-y-2 px-4">
             <li>
                 <a href="{{ route('dashboard') }}"
@@ -217,7 +217,7 @@
     <div class="bg-white shadow h-16 flex items-center justify-between px-6">
         <h1 class="text-xl font-semibold">@yield('page', 'Dashboard')</h1>
         <form action="{{ route('logout') }}" method="get">
-            <button class="bg-[#89E355] text-white px-4 py-2 rounded hover:bg-[#7ED242]">Logout</button>
+            <button class="bg-red= text-white px-4 py-2 rounded hover:bg-[#7ED242]">Keluar</button>
         </form>
     </div>
 

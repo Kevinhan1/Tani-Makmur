@@ -123,8 +123,13 @@
                 <path d="M21 21l-6-6M11 19a8 8 0 100-16 8 8 0 000 16z"/>
             </svg>
         </div>
-        <div class="overflow-y-auto max-h-[400px]">
-            <table class="w-full text-sm text-left border">
+        <div class="flex justify-between items-center mt-3 text-sm text-gray-600">
+                <button id="prevPage" class="px-3 py-1 border border-gray-500 bg-gray-100 rounded hover:bg-gray-200"><</button>
+                <span id="pageIndicator">Halaman 1</span>
+                <button id="nextPage" class="px-3 py-1 border border-gray-500 bg-gray-100 rounded hover:bg-gray-200">></button>
+        </div>
+        <div class="overflow-y-auto max-h-[400px] hide-scrollbar">
+            <table class="w-full text-sm text-left border mt-3">
                 <thead class="bg-gray-100 text-gray-700 ">
                     <tr>
                         <th class="px-4 py-2 font-normal">Nota</th>
@@ -221,7 +226,7 @@ function openModal(item = null) {
         editMode = true;
         editRef = item.noref;
     } else {
-        document.getElementById('noref').value = 'REF' + String(norefCounter).padStart(3, '0');
+        document.getElementById('noref').value = 'REF-' + String(norefCounter).padStart(3, '0');
     }
 }
 
@@ -361,13 +366,20 @@ function toggleHistory(show = true) {
 }
 
 // Bagian loadHistory di JS
-function loadHistory() {
-    fetch("{{ url('/api/history-pembelian') }}")
+let currentPage = 1;
+const limit = 5;
+
+function loadHistory(page = 1) {
+    const keyword = document.getElementById('search-history').value;
+    fetch(`/api/history-pembelian?page=${page}&limit=5&search=${encodeURIComponent(keyword)}`)
     .then(res => res.json())
     .then(data => {
+        currentPage = data.current_page;
         const tbody = document.getElementById('history-body');
+        const pageIndicator = document.getElementById('pageIndicator');
         tbody.innerHTML = '';
-        data.forEach(row => {
+
+        data.data.forEach(row => {
             const tr = document.createElement('tr');
             tr.classList.add('border-b');
             tr.innerHTML = `
@@ -378,7 +390,7 @@ function loadHistory() {
                 <td class="px-4 py-2 text-center">
                     <div class="flex flex-col gap-1">
                         <a href="/pembelian/${row.notabeli}/invoice" target="_blank"
-                        class=" border border-gray-300 bg-white-500 hover:bg-white-600 text-black text-xs px-2 py-1 rounded text-center">
+                        class="border border-gray-300 bg-white text-black text-xs px-2 py-1 rounded text-center">
                             Invoice
                         </a>
                         <button onclick="hapusHistory('${row.notabeli}', '', ${row.totalbayar}, 0)"
@@ -386,11 +398,32 @@ function loadHistory() {
                             Hapus
                         </button>
                     </div>
-                </td>`;
+                </td>
+            `;
             tbody.appendChild(tr);
         });
+renderPagination(data);
     });
 }
+
+function renderPagination(data) {
+    const pageIndicator = document.getElementById('pageIndicator');
+    pageIndicator.textContent = `Halaman ${data.current_page} dari ${data.last_page}`;
+
+    document.getElementById('prevPage').disabled = data.current_page <= 1;
+    document.getElementById('nextPage').disabled = data.current_page >= data.last_page;
+}
+
+
+document.getElementById('prevPage').onclick = () => {
+    if (currentPage > 1) {
+        loadHistory(currentPage - 1);
+    }
+};
+
+document.getElementById('nextPage').onclick = () => {
+    loadHistory(currentPage + 1);
+};
 
 
 function filterHistory() {

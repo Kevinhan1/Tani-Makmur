@@ -120,9 +120,12 @@ class PenjualanController extends Controller
     }
 
 
-    public function getHistory()
+    public function getHistory(Request $request)
     {
-        $data = DB::table('thjual')
+        $limit = $request->input('limit', 5);
+        $keyword = $request->input('search');
+
+        $query = DB::table('thjual')
             ->join('tpelanggan', 'thjual.kodepelanggan', '=', 'tpelanggan.kodepelanggan')
             ->select(
                 'thjual.notajual',
@@ -130,11 +133,19 @@ class PenjualanController extends Controller
                 'thjual.total',
                 'tpelanggan.namapelanggan'
             )
-            ->orderByDesc('thjual.tanggal')
-            ->get();
+            ->orderByDesc('thjual.tanggal');
+
+        if ($keyword) {
+            $query->where('thjual.notajual', 'like', "%$keyword%");
+        }
+
+        $data = $query->paginate($limit);
 
         return response()->json($data);
     }
+
+
+
 
 public function deleteHistory(Request $request)
 {

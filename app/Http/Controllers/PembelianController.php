@@ -98,8 +98,11 @@ class PembelianController extends Controller
     }
 
 
-    public function getHistory()
+    public function getHistory(Request $request)
     {
+        $limit = $request->get('limit', 5); // jumlah per halaman
+        $page = $request->get('page', 1);
+
         $data = DB::table('thbeli')
             ->join('tpemasok', 'thbeli.kodepemasok', '=', 'tpemasok.kodepemasok')
             ->select(
@@ -110,10 +113,11 @@ class PembelianController extends Controller
                 'tpemasok.namapemasok'
             )
             ->orderByDesc('thbeli.tanggal')
-            ->get();
+            ->paginate($limit, ['*'], 'page', $page);
 
         return response()->json($data);
     }
+
 
     public function deleteHistory(Request $request)
     {
