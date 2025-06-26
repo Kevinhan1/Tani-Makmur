@@ -149,7 +149,7 @@
 
             <div class="mb-4">
                 <label for="tanggal" class="block text-sm font-medium">Tanggal</label>
-                <input type="date" name="tanggal" id="tanggal" class="w-full border rounded px-3 py-2" required value="{{ request('tanggal_akhir', date('Y-m-d')) }}">
+                <input type="date" name="tanggal" id="tanggal" class="w-full border rounded px-3 py-2" value="{{ date('Y-m-d') }}" required >
             </div>
 
             <div class="mb-4">

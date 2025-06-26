@@ -67,17 +67,17 @@
         </thead>
         <tbody>
             @php $saldo = 0; @endphp
-           @forelse ($kas as $item)
+            @forelse ($kas as $item)
 															<tr>
 																			<td>{{ \Carbon\Carbon::parse($item->tanggal)->format('d-m-Y') }}</td>
 																			<td>{{ $item->nogenerate }}</td>
 																			<td>{{ $item->noreferensi }}</td>
-																			<td>{{ $item->keterangan }}</td>
-																			<td>{{ $item->rekening->namarekening ?? '-' }}</td>
-																			<td>{{ $item->jenis }}</td>
-																			<td class="text-green">Rp{{ number_format($item->masuk, 0, ',', '.') }}</td>
-																			<td class="text-red">Rp{{ number_format($item->keluar, 0, ',', '.') }}</td>
-																			<td class="text-left">Rp{{ number_format($saldo, 0, ',', '.') }}</td>
+																			<td class="text-align-left">{{ $item->keterangan }}</td>
+																			<td class="text-align-left">{{ $item->rekening->namarekening ?? '-' }}</td>
+																			<td class="text-align-left">{{ $item->jenis }}</td>
+																			<td class="text-green text-align-left">Rp{{ number_format($item->masuk, 0, ',', '.') }}</td>
+																			<td class="text-red text-align-left">Rp{{ number_format($item->keluar, 0, ',', '.') }}</td>
+																			<td class="text-align-left">Rp{{ number_format($saldo, 0, ',', '.') }}</td>
 															</tr>
 											@empty
 															<tr>

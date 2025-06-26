@@ -37,7 +37,7 @@
                     <td>{{ $row['noref'] }}</td>
                     <td>{{ $row['namabarang'] }}</td>
                     <td class="text-right">{{ $row['masuk'] > 0 ? $row['masuk'] : '-' }}</td>
-																				<td class="text-right">{{ $row['keluar'] > 0 ? $row['keluar'] : '-' }}</td>
+					<td class="text-right">{{ $row['keluar'] > 0 ? $row['keluar'] : '-' }}</td>
                     <td>{{ $row['jenis'] }}</td>
                     <td>{{ $row['keterangan'] ?? '-' }}</td>
                 </tr>

@@ -80,7 +80,7 @@
 <div id="modalBayar" class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center hidden z-50">
     <div class="bg-white rounded shadow p-6 w-[90%] md:w-[500px] relative">
         <h2 class="text-xl font-semibold mb-4">Form Pembayaran</h2>
-        <form method="POST" action="{{ route('pembayaran-penjualan.store') }}">
+        <form id="formBayar" method="POST" action="{{ route('pembayaran-penjualan.store') }}">
             @csrf
             <button type="button" onclick="openHistoryModal()" class="w-full px-3 py-1 border-1 rounded bg-gray-200 text-black hover:bg-gray-300 mb-4">
                 Lihat History Pembayaran
@@ -236,7 +236,7 @@
     }
 
     function submitFormBayar() {
-        document.querySelector('#modalBayar form').submit();
+        document.querySelector('#formBayar').submit(); // pakai ID langsung
     }
 
     function editBayar(no) {

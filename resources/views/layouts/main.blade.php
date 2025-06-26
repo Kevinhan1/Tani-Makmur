@@ -199,7 +199,7 @@
                 </a>
             </li>
             <li>
-                <a href="{{ route('laporanpenjualan.index') }}" 
+                <a href="{{ route('laporan-penjualan.index') }}" 
                 class="w-full flex items-center  gap-2 px-2 py-2 hover:bg-gray-100 rounded transition text-black-100">
                 <img src="{{ asset('icons\diagram.svg') }}" alt="Dashboard Icon" class="w-5 h-5">
                     Laporan Penjualan

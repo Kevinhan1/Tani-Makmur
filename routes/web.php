@@ -20,6 +20,8 @@ use App\Http\Controllers\MutasiRekeningController;
 use App\Http\Controllers\MutasiStokController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KasController;
+use App\Http\Controllers\PiutangController;
+use App\Http\Controllers\LaporanPenjualanController;
 
 
 
@@ -124,11 +126,19 @@ Route::get('mutasirekening/pdf', [MutasiRekeningController::class, 'exportPdf'])
 Route::get('/mutasi-stok', [MutasiStokController::class, 'index'])->name('mutasi-stok.index');
 Route::get('/mutasi-stok/pdf', [MutasiStokController::class, 'exportPdf'])->name('mutasi-stok.pdf');
 
+
+// Kas
 Route::get('/kas', [BarangController::class, 'index'])->name('kas.index');
 Route::get('/kas', [KasController::class, 'index'])->name('kas.index');
 Route::get('/kas/pdf', [KasController::class, 'exportPdf'])->name('kas.pdf');
 
-Route::get('/piutang', [BarangController::class, 'index'])->name('piutang.index');
-Route::get('/laporan-penjualan', [BarangController::class, 'index'])->name('laporanpenjualan.index');
 
 
+// Piutang
+Route::get('/piutang', [PiutangController::class, 'index'])->name('piutang.index');
+
+
+
+// Laporan-Penjualan
+Route::get('/laporan-penjualan', [LaporanPenjualanController::class, 'index'])->name('laporan-penjualan.index');
+Route::get('/laporan-penjualan/detail/{notajual}', [LaporanPenjualanController::class, 'detail']);

@@ -122,10 +122,6 @@
         <tbody>
             @php $saldo = $saldoAwal ?? 0; @endphp
                 @forelse ($kas as $item)
-                    @php
-                        $saldo += $item->masuk;
-                        $saldo -= $item->keluar;
-                    @endphp
                     <tr class="border-t">
                         <td class="px-4 py-2">{{ \Carbon\Carbon::parse($item->tanggal)->format('d-m-Y') }}</td>
                         <td class="px-4 py-2">{{ $item->nogenerate }}</td>
