@@ -123,22 +123,26 @@
         </thead>
         <tbody>
             @php $saldo = $saldoAwal ?? 0; @endphp
-                @forelse ($kas as $item)
-                    <tr class="border-t">
-                        <td class="px-4 py-2">{{ \Carbon\Carbon::parse($item->tanggal)->format('d-m-Y') }}</td>
-                        <td class="px-4 py-2">{{ $item->nogenerate }}</td>
-                        <td class="px-4 py-2">{{ $item->noreferensi }}</td>
-                        <td class="px-4 py-2">{{ $item->keterangan }}</td>
-                        <td class="px-4 py-2">{{ $item->jenis }}</td>
-                        <td class="px-4 py-2 text-green-600">Rp{{ number_format($item->masuk, 0, ',', '.') }}</td>
-                        <td class="px-4 py-2 text-red-600">Rp{{ number_format($item->keluar, 0, ',', '.') }}</td>
-                        <td class="px-4 py-2">Rp{{ number_format($saldo, 0, ',', '.') }}</td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="8" class="text-center text-gray-500 py-4">Tidak ada data kas.</td>
-                    </tr>
-                @endforelse
+            @forelse ($kas as $item)
+                @php
+                    $saldo += $item->masuk - $item->keluar;
+                @endphp
+                <tr class="border-t">
+                    <td class="px-4 py-2">{{ \Carbon\Carbon::parse($item->tanggal)->format('d-m-Y') }}</td>
+                    <td class="px-4 py-2">{{ $item->nogenerate }}</td>
+                    <td class="px-4 py-2">{{ $item->noreferensi }}</td>
+                    <td class="px-4 py-2">{{ $item->keterangan }}</td>
+                    <td class="px-4 py-2">{{ $item->jenis }}</td>
+                    <td class="px-4 py-2 text-green-600">Rp{{ number_format($item->masuk, 0, ',', '.') }}</td>
+                    <td class="px-4 py-2 text-red-600">Rp{{ number_format($item->keluar, 0, ',', '.') }}</td>
+                    <td class="px-4 py-2">Rp{{ number_format($saldo, 0, ',', '.') }}</td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="8" class="text-center text-gray-500 py-4">Tidak ada data kas.</td>
+                </tr>
+            @endforelse
+
         </tbody>
     </table>
 </div>

@@ -131,7 +131,7 @@
             <button onclick="toggleHistory(false)" class="text-gray-500 hover:text-black">&times;</button>
         </div>
         <div class="relative mb-4">
-            <input type="text" id="search-history" class="w-full border px-4 py-2 rounded" placeholder="Cari berdasarkan No Nota" oninput="filterHistory()">
+            <input type="text" id="search-history" class="w-full border px-4 py-2 rounded" placeholder="Cari berdasarkan No Nota" oninput="loadHistory()">
             <svg class="absolute right-3 top-3 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path d="M21 21l-6-6M11 19a8 8 0 100-16 8 8 0 000 16z"/>
             </svg>
@@ -367,6 +367,8 @@ let currentPage = 1;
 
 function loadHistory(page = 1) {
     const keyword = document.getElementById('search-history').value;
+    const pageIndicator = document.getElementById('pageIndicator'); // <-- pindahkan ke sini
+
     fetch(`/api/history-penjualan?page=${page}&limit=5&search=${encodeURIComponent(keyword)}`)
     .then(res => res.json())
     .then(data => {
@@ -374,30 +376,50 @@ function loadHistory(page = 1) {
         tbody.innerHTML = '';
         currentPage = data.current_page;
 
-        data.data.forEach(row => {
-            const tr = document.createElement('tr');
-            tr.classList.add('border-b');
-            tr.innerHTML = `
-                <td class="px-4 py-2">${row.notajual}</td>
-                <td class="px-4 py-2">${row.tanggal}</td>
-                <td class="px-4 py-2">${row.namapelanggan}</td>
-                <td class="px-4 py-2 text-center">Rp ${formatRupiah(row.total)}</td>
-                <td class="px-4 py-2 text-center">
-                    <div class="flex flex-col gap-1">
-                        <a href="/penjualan/${row.notajual}/invoice" target="_blank"
+        if (data.data.length === 0) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+        <td colspan="5" class="text-center py-4 text-gray-500">
+            Nota tidak ditemukan.
+        </td>`;
+    tbody.appendChild(tr);
+} else {
+    data.data.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.classList.add('border-b');
+        tr.innerHTML = `
+            <td class="px-4 py-2">${row.notajual}</td>
+            <td class="px-4 py-2">${row.tanggal}</td>
+            <td class="px-4 py-2">${row.namapelanggan}</td>
+            <td class="px-4 py-2 text-center">Rp ${formatRupiah(row.total)}</td>
+            <td class="px-4 py-2 text-center">
+                <div class="flex flex-col gap-1">
+                    <a href="/penjualan/${row.notajual}/invoice" target="_blank"
                         class=" border border-gray-300 bg-white-500 hover:bg-white-600 text-black text-xs px-2 py-1 rounded text-center">
-                            Invoice
-                        </a>
-                        <button onclick="hapusHistory('${row.notajual}')"
+                        Invoice
+                    </a>
+                    <button onclick="hapusHistory('${row.notajual}')"
                         class="bg-red-500 hover:bg-red-600 text-white text-xs px-2 py-1 rounded text-center">
-                            Hapus
-                        </button>
-                    </div>
-                </td>`;
-            tbody.appendChild(tr);
-        });
+                        Hapus
+                    </button>
+                </div>
+            </td>`;
+        tbody.appendChild(tr);
+    });
+}
 
+
+        pageIndicator.textContent = `Halaman ${data.current_page} dari ${data.last_page}`;
         renderPagination(data);
+    });
+        document.getElementById('prevPage').addEventListener('click', () => {
+        if (currentPage > 1) {
+            loadHistory(currentPage - 1);
+        }
+    });
+
+    document.getElementById('nextPage').addEventListener('click', () => {
+        loadHistory(currentPage + 1);
     });
 }
 
@@ -407,7 +429,6 @@ function renderPagination(data) {
 
     if (data.last_page <= 1) return;
 
-    // Tombol Previous
     const prev = document.createElement('button');
     prev.textContent = '«';
     prev.disabled = !data.prev_page_url;
@@ -415,16 +436,16 @@ function renderPagination(data) {
     prev.onclick = () => loadHistory(currentPage - 1);
     pagination.appendChild(prev);
 
-    // Nomor halaman
     for (let i = 1; i <= data.last_page; i++) {
         const btn = document.createElement('button');
         btn.textContent = i;
         btn.className = `px-2 py-1 border rounded ${i === data.current_page ? 'bg-gray-300 font-bold' : ''}`;
-        btn.onclick = () => loadHistory(i);
+        btn.addEventListener('click', () => {
+            loadHistory(i);
+        });
         pagination.appendChild(btn);
     }
 
-    // Tombol Next
     const next = document.createElement('button');
     next.textContent = '»';
     next.disabled = !data.next_page_url;
@@ -433,14 +454,6 @@ function renderPagination(data) {
     pagination.appendChild(next);
 }
 
-
-function filterHistory() {
-    const search = document.getElementById('search-history').value.toLowerCase();
-    document.querySelectorAll('#history-body tr').forEach(row => {
-        const text = row.textContent.toLowerCase();
-        row.style.display = text.includes(search) ? '' : 'none';
-    });
-}
 
 function hapusHistory(notajual) {
     showModalAlert(`Yakin ingin menghapus nota ${notajual}?`, () => {

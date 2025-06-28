@@ -139,7 +139,11 @@
                         <th class="px-4 py-2 text-center font-normal">Aksi</th>
                     </tr>
                 </thead>
-                <tbody id="history-body"></tbody>
+                <tbody id="history-body">
+                    <tr id="no-data-row" class="text-center text-gray-500 hidden">
+                        <td colspan="5" class="py-4">Nota tidak ditemukan</td>
+                    </tr>
+                </tbody>
             </table>
         </div>
     </div>
@@ -376,35 +380,46 @@ function loadHistory(page = 1) {
     .then(data => {
         currentPage = data.current_page;
         const tbody = document.getElementById('history-body');
+        const noDataRow = document.getElementById('no-data-row');
         const pageIndicator = document.getElementById('pageIndicator');
-        tbody.innerHTML = '';
 
-        data.data.forEach(row => {
-            const tr = document.createElement('tr');
-            tr.classList.add('border-b');
-            tr.innerHTML = `
-                <td class="px-4 py-2">${row.notabeli}</td>
-                <td class="px-4 py-2">${row.tanggal}</td>
-                <td class="px-4 py-2">${row.namapemasok}</td>
-                <td class="px-4 py-2 text-center">Rp ${formatRupiah(row.total)}</td>
-                <td class="px-4 py-2 text-center">
-                    <div class="flex flex-col gap-1">
-                        <a href="/pembelian/${row.notabeli}/invoice" target="_blank"
-                        class="border border-gray-300 bg-white text-black text-xs px-2 py-1 rounded text-center">
-                            Invoice
-                        </a>
-                        <button onclick="hapusHistory('${row.notabeli}', '', ${row.totalbayar}, 0)"
-                        class="bg-red-500 hover:bg-red-600 text-white text-xs px-2 py-1 rounded text-center">
-                            Hapus
-                        </button>
-                    </div>
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
-renderPagination(data);
+        // Hapus semua baris KECUALI no-data-row
+        tbody.querySelectorAll('tr:not(#no-data-row)').forEach(row => row.remove());
+
+        if (data.data.length === 0) {
+            noDataRow.classList.remove('hidden');
+        } else {
+            noDataRow.classList.add('hidden');
+            data.data.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.classList.add('border-b');
+                tr.innerHTML = `
+                    <td class="px-4 py-2">${row.notabeli}</td>
+                    <td class="px-4 py-2">${row.tanggal}</td>
+                    <td class="px-4 py-2">${row.namapemasok}</td>
+                    <td class="px-4 py-2 text-center">Rp ${formatRupiah(row.total)}</td>
+                    <td class="px-4 py-2 text-center">
+                        <div class="flex flex-col gap-1">
+                            <a href="/pembelian/${row.notabeli}/invoice" target="_blank"
+                            class="border border-gray-300 bg-white text-black text-xs px-2 py-1 rounded text-center">
+                                Invoice
+                            </a>
+                            <button onclick="hapusHistory('${row.notabeli}', '', ${row.totalbayar}, 0)"
+                            class="bg-red-500 hover:bg-red-600 text-white text-xs px-2 py-1 rounded text-center">
+                                Hapus
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        renderPagination(data);
     });
 }
+
+
 
 function renderPagination(data) {
     const pageIndicator = document.getElementById('pageIndicator');
@@ -428,11 +443,25 @@ document.getElementById('nextPage').onclick = () => {
 
 function filterHistory() {
     const search = document.getElementById('search-history').value.toLowerCase();
-    document.querySelectorAll('#history-body tr').forEach(row => {
-        const text = row.textContent.toLowerCase();
-        row.style.display = text.includes(search) ? '' : 'none';
+    const rows = document.querySelectorAll('#history-body tr');
+    let matchCount = 0;
+
+    rows.forEach(row => {
+        const isNoDataRow = row.id === 'no-data-row';
+        if (isNoDataRow) return;
+
+        const rowText = row.textContent.toLowerCase();
+        const match = rowText.includes(search);
+
+        row.style.display = match ? '' : 'none';
+        if (match) matchCount++;
     });
+
+    const noDataRow = document.getElementById('no-data-row');
+    noDataRow.classList.toggle('hidden', matchCount > 0);
 }
+
+
 function hapusHistory(notabeli, noref = '') {
     showModalAlert(`Yakin ingin menghapus nota ${notabeli}?`, () => {
         fetch('/api/history-pembelian/delete', {

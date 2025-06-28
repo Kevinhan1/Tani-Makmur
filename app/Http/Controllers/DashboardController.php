@@ -34,22 +34,34 @@ class DashboardController extends Controller
         })->sum('qty');
 
         // Produk terlaris top 3 bulan ini
-        $topProduk = Djual::select('noref', DB::raw('SUM(qty) as total_qty'))
+        $topProduk = Djual::with('detailBeli.barang')
             ->whereHas('header', function ($q) use ($bulanIni) {
                 $q->where('tanggal', 'like', "$bulanIni-%");
             })
-            ->groupBy('noref')
-            ->orderByDesc('total_qty')
-            ->with('detailBeli.barang')
+            ->get()
+            ->groupBy(fn($item) => optional($item->detailBeli)->kodebarang)
+            ->map(function ($items, $kodebarang) {
+                return [
+                    'kodebarang' => $kodebarang,
+                    'qty' => $items->sum('qty'),
+                    'namabarang' => optional($items->first()->detailBeli->barang)->namabarang ?? $kodebarang,
+                ];
+            })
+            ->sortByDesc('qty')
             ->take(3)
-            ->get();
+            ->values();
 
         $produkChart = $topProduk->map(function ($item) {
             return [
-                'nama' => $item->detailBeli->barang->namabarang ?? '-',
-                'qty' => $item->total_qty,
+                'nama' => $item['namabarang'],
+                'qty' => $item['qty'],
             ];
         });
+
+        // Tambahkan jika < 3
+        while ($produkChart->count() < 3) {
+            $produkChart->push(['nama' => '-', 'qty' => 0]);
+        }
 
         return view('dashboard', [
             'totalHariIni' => $totalHariIni,

@@ -136,7 +136,11 @@ class PenjualanController extends Controller
             ->orderByDesc('thjual.tanggal');
 
         if ($keyword) {
-            $query->where('thjual.notajual', 'like', "%$keyword%");
+            $query->where(function ($q) use ($keyword) {
+                $q->where('thjual.notajual', 'like', "%$keyword%")
+                ->orWhere('tpelanggan.namapelanggan', 'like', "%$keyword%")
+                ->orWhere('thjual.tanggal', 'like', "%$keyword%");
+            });
         }
 
         $data = $query->paginate($limit);

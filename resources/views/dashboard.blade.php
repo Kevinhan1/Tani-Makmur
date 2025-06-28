@@ -39,7 +39,7 @@
     </div>
 
     <h2 class="text-2xl font-semibold mt-4 mb-4">Top Produk Terlaris</h2>
-    <div class="bg-white p-6 rounded shadow w-full">
+    <div class="bg-white p-6 rounded shadow max-w-[1590px] w-full">
         <p class="text-xl font-medium mb-4">Top 3 Produk Terlaris Bulan Ini</p>
         <canvas id="produkChart" height="30"></canvas>
     </div>
@@ -62,7 +62,7 @@
                 label: 'Qty Terjual',
                 data: dataQty,
                 backgroundColor: '#89E355',
-                borderRadius: 5,
+                borderRadius: 8,
             }]
         },
         options: {
@@ -77,7 +77,6 @@
                     font: {
                         weight: 'bold'
                     },
-                    offset: -70,
                     formatter: function(value) {
                         return value + ' pcs';
                     }

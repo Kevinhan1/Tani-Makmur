@@ -87,7 +87,7 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse ($data as $item)
+                @forelse ($data->filter(fn($item) => $item->sisa > 0) as $item)
                     <tr class="border-b text-sm hover:bg-gray-50">
                         <td class="px-4 py-2">{{ $item->notajual }}</td>
                         <td class="px-4 py-2">{{ \Carbon\Carbon::parse($item->tanggal)->format('d-m-Y') }}</td>
