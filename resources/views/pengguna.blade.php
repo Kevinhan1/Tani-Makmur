@@ -258,7 +258,7 @@ async function hapusPengguna() {
   if (!await showConfirmDelete(`Apakah Anda yakin ingin menghapus ${sel.length} data?`)) return;
 
   for (let id of sel) {
-    await fetch(`/pengguna+/${id}`, {
+    await fetch(`/pengguna/${id}`, {
       method: 'DELETE',
       headers: {
         'X-CSRF-TOKEN': '{{ csrf_token() }}',

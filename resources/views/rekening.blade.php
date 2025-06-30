@@ -154,6 +154,16 @@
     </div>
 </div>
 
+<!-- Modal Putih Alert -->
+<div id="custom-modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 hidden z-50">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm text-center">
+        <p id="custom-modal-message" class="text-gray-700 mb-4 text-sm"></p>
+        <button id="custom-modal-ok" class="bg-[#89E355] hover:bg-[#7ED242] text-white px-4 py-2 rounded">
+            OK
+        </button>
+    </div>
+</div>
+
 <script>
 function toggleModal() {
     document.getElementById('modalForm').classList.toggle('hidden');
