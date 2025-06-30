@@ -28,12 +28,9 @@ use App\Http\Controllers\LaporanPenjualanController;
 
 // Halaman utama
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('/login');
+    //return view('welcome');
 });
-
-// Langsung arahkan ke halaman form tambah pengguna
-Route::get('/daftar', [PenggunaController::class, 'create'])->name('pengguna.create');
-Route::post('/daftar', [PenggunaController::class, 'store'])->name('pengguna.store');
 
 // Rute untuk halaman login dan proses login
 Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');

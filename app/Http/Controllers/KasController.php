@@ -61,6 +61,25 @@ class KasController extends Controller
 
     public function exportPdf(Request $request)
     {   
+
+        // Hitung Saldo Awal
+        $saldoAwal = 0;
+        if ($request->filled('tanggal_awal')) {
+            $saldoAwal = MutasiRekening::when($request->filled('rekening'), function ($q) use ($request) {
+                    $q->where('koderekening', $request->rekening);
+                })
+                ->where('tanggal', '<', $request->tanggal_awal)
+                ->sum(DB::raw('masuk - keluar'));
+        }
+
+        // Hitung Saldo Akhir
+        if ($request->filled('rekening')) {
+            $rekening = Rekening::where('koderekening', $request->rekening)->first();
+            $saldoRekening = $rekening?->saldo ?? 0;
+        } else {
+            $saldoRekening = Rekening::sum('saldo');
+        }
+
         $query = MutasiRekening::with('rekening')->orderBy('tanggal');
 
         if ($request->filled('tanggal_awal') && $request->filled('tanggal_akhir')) {
@@ -88,6 +107,8 @@ class KasController extends Controller
             'tanggalAwal' => $request->tanggal_awal,
             'tanggalAkhir' => $request->tanggal_akhir,
             'rekeningNama' => $rekeningNama,
+            'saldoAwal' => $saldoAwal,
+            'saldoRekening' => $saldoRekening,
             'jenis' => $request->jenis,
         ])->setPaper('A4', 'portrait');
 

@@ -58,6 +58,16 @@ class PembayaranPenjualanController extends Controller
             return back()->withErrors(['total_bayar' => 'Saldo tidak cukup untuk melakukan pembayaran.'])->withInput();
         }
 
+        $nota = Hjual::where('notajual', $request->notajual)->first();
+        if (!$nota) {
+            return back()->withErrors(['notajual' => 'Nota penjualan tidak ditemukan.'])->withInput();
+        }
+
+        $sisa = $nota->total - $nota->totalbayar;
+        if ($request->total_bayar > $sisa) {
+            return back()->withErrors(['total_bayar' => 'Jumlah pembayaran melebihi sisa tagihan.'])->withInput();
+        }
+
         $tanggal = Carbon::parse($request->tanggal_bayar)->format('dmy');
         $lastNo = Dbayarjual::whereRaw("RIGHT(no, 6) = ?", [$tanggal])
             ->orderByDesc('no')
@@ -123,6 +133,17 @@ class PembayaranPenjualanController extends Controller
         'koderekening' => 'required|exists:trekening,koderekening',
         'total' => 'required|numeric|min:1'
     ]);
+
+    $bayar = Dbayarjual::where('no', $no)->firstOrFail();
+    $nota = Hjual::where('notajual', $bayar->notajual)->first();
+
+    $sisaSebelum = $nota->total - $nota->totalbayar + $bayar->total;
+
+    if ($request->total > $sisaSebelum) {
+    return back()
+        ->withErrors(['total' => 'Jumlah yang diubah melebihi sisa tagihan.'])
+        ->withInput(); // penting!
+    }
 
     DB::beginTransaction();
     try {

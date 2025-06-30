@@ -25,7 +25,7 @@ class PenggunaController extends Controller
             $query->where('namapengguna', 'like', '%' . $request->search . '%');
         }
 
-        $pengguna = $query->get();
+        $pengguna = $query->paginate(15)->withQueryString();
         $nextCode = $this->getNextKodePengguna();
 
         return view('pengguna', compact('pengguna', 'nextCode'));

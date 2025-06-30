@@ -184,7 +184,10 @@
 </div>
 
 {{-- Modal Edit Bayar --}}
-
+@php
+    $editNo = session('edit_bayar_no');
+    $editData = $editNo ? \App\Models\Dbayarbeli::find($editNo) : null;
+@endphp
 <div id="modalEditBayar" class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center hidden z-50">
     <div class="bg-white rounded shadow p-6 w-[90%] md:w-[500px] relative">
         <h2 class="text-xl font-semibold mb-4">Edit Pembayaran</h2>
@@ -196,13 +199,27 @@
                 <select name="koderekening" id="editRekening" class="w-full border rounded px-2 py-1" required>
                     <option value="">Pilih Rekening</option>
                     @foreach ($rekeningAktif as $rekening)
-                        <option value="{{ $rekening->koderekening }}">{{ $rekening->namarekening }}</option>
+                        <option value="{{ $rekening->koderekening }}"
+                            @if (old('koderekening') == $rekening->koderekening || ($editData && $editData->koderekening == $rekening->koderekening))
+                                selected
+                            @endif>
+                            {{ $rekening->namarekening }}
+                        </option>
                     @endforeach
                 </select>
             </div>
             <div class="mb-4">
                 <label class="block text-sm font-medium">Total Bayar</label>
-                <input type="number" step="0.01" name="total" id="editTotal" class="w-full border rounded px-2 py-1" required>
+                <input type="number" step="0.01" name="total" id="editTotal" class="w-full border rounded px-2 py-1"
+                value="{{ old('total', $editData->total ?? '') }}" required>
+                @error('total')
+                    <div class="text-red-600 text-sm mt-1 bg-white p-2 rounded shadow">{{ $message }}</div>
+                    <script>
+                        window.addEventListener('DOMContentLoaded', () => {
+                            document.getElementById('modalEditBayar').classList.remove('hidden');
+                        });
+                    </script>
+                @enderror
             </div>
             <div class="flex justify-end gap-2">
                 <button type="submit" class="px-4 py-2 bg-[#89E355] text-white rounded hover:bg-[#7ED242]">Simpan</button>

@@ -50,6 +50,10 @@
     </p>
 				<p>Rekening: {{ $rekeningNama ?? 'Semua' }}</p>
 				<p>Jenis: {{ request('jenis') ?? 'Semua' }}</p>
+
+                <p><strong>Saldo Awal:</strong> Rp{{ number_format($saldoAwal ?? 0, 0, ',', '.') }}</p>
+                <p><strong>Saldo Akhir:</strong> Rp{{ number_format($saldoRekening ?? 0, 0, ',', '.') }}</p>
+
 				
     <table>
         <thead>

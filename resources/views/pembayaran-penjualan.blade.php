@@ -148,6 +148,14 @@
             <div class="mb-4">
                 <label class="block text-sm font-medium">Jumlah Bayar</label>
                 <input type="number" step="0.01" name="total_bayar" id="formSisa" class="w-full border rounded px-2 py-1" required>
+                @error('total_bayar')
+                    <div class="text-red-600 text-sm mt-1 bg-white p-2 rounded shadow">{{ $message }}</div>
+                    <script>
+                        window.addEventListener('DOMContentLoaded', () => {
+                            document.getElementById('modalBayar').classList.remove('hidden');
+                        });
+                    </script>
+                @enderror
             </div>
             <div class="flex justify-end gap-2">
                 <button type="button" onclick="openModalKonfirmasi()" class="px-4 py-2 bg-[#89E355] text-white rounded hover:bg-[#7ED242]">Simpan</button>
@@ -179,13 +187,24 @@
                 <select name="koderekening" id="editRekening" class="w-full border rounded px-2 py-1" required>
                     <option value="">Pilih Rekening</option>
                     @foreach ($rekeningAktif as $rekening)
-                        <option value="{{ $rekening->koderekening }}">{{ $rekening->namarekening }}</option>
+                        <option value="{{ $rekening->koderekening }}" 
+                            {{ old('koderekening') == $rekening->koderekening ? 'selected' : '' }}>
+                            {{ $rekening->namarekening }}
+                        </option>
                     @endforeach
                 </select>
             </div>
             <div class="mb-4">
                 <label class="block text-sm font-medium">Total Bayar</label>
-                <input type="number" step="0.01" name="total" id="editTotal" class="w-full border rounded px-2 py-1" required>
+                <input type="number" step="0.01" name="total" id="editTotal" class="w-full border rounded px-2 py-1" value="{{ old('total') }}" required>
+                @error('total')
+                    <div class="text-red-600 text-sm mt-1 bg-white p-2 rounded shadow">{{ $message }}</div>
+                    <script>
+                        window.addEventListener('DOMContentLoaded', () => {
+                            document.getElementById('modalEditBayar').classList.remove('hidden');
+                        });
+                    </script>
+                @enderror
             </div>
             <div class="flex justify-end gap-2">
                 <button type="submit" class="px-4 py-2 bg-[#89E355] text-white rounded hover:bg-[#7ED242]">Simpan</button>

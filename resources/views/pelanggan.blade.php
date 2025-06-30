@@ -88,10 +88,11 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($pelanggan as $item)
+                @forelse ($pelanggan as $item)
                 <tr class="border-t {{ $item->aktif ? '' : 'text-gray-400' }}">
                     <td class="px-4 py-2 text-center">
-                        <input type="checkbox" class="item-checkbox cursor-pointer accent-gray-400" value="{{ $item->kodepelanggan }}" onchange="updateActionButtons()" style="width:14px; height:14px;">
+                        <input type="checkbox" class="item-checkbox cursor-pointer accent-gray-400"
+                            value="{{ $item->kodepelanggan }}" onchange="updateActionButtons()" style="width:14px; height:14px;">
                     </td>
                     <td class="px-4 py-2">{{ $item->kodepelanggan }}</td>
                     <td class="px-4 py-2">{{ $item->namapelanggan }}</td>
@@ -104,7 +105,18 @@
                     <td class="px-4 py-2">{{ $item->npwp }}</td>
                     <td class="px-4 py-2">{{ $item->nitku }}</td>
                 </tr>
-                @endforeach
+                @empty
+                <tr>
+                    <td colspan="11" class="text-center text-gray-500 py-4">
+                        @if(request('search'))
+                            Pelanggan dengan kata kunci "<strong>{{ request('search') }}</strong>" tidak ditemukan.
+                            <br>
+                        @else
+                            Tidak ada data pelanggan.
+                        @endif
+                    </td>
+                </tr>
+                @endforelse
             </tbody>
         </table>
     </form>

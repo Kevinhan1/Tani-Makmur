@@ -77,6 +77,13 @@ class PembayaranPembelianController extends Controller
         return back()->withErrors(['total_bayar' => 'Saldo tidak cukup untuk melakukan pembayaran.'])->withInput();
     }
 
+    // Cek total pembayaran tidak melebihi sisa bayar
+    $nota = Hbeli::where('notabeli', $request->notabeli)->first();
+    $sisa = $nota->total - $nota->totalbayar;
+
+    if ($request->total_bayar > $sisa) {
+        return back()->withErrors(['total_bayar' => 'Jumlah bayar melebihi sisa yang harus dibayar.'])->withInput();
+    }
 
     // Ambil tanggal dalam format ddMMyy (bukan yyMMdd)
     $tanggal = \Carbon\Carbon::parse($request->tanggal_bayar)->format('dmy'); // contoh: 220622
@@ -153,6 +160,22 @@ public function update(Request $request, $no)
         'total' => 'required|numeric|min:1'
     ]);
 
+    // Ambil data nota dan pembayaran lama
+    $bayar = Dbayarbeli::where('no', $no)->firstOrFail();
+    $nota = Hbeli::where('notabeli', $bayar->notabeli)->first();
+
+    // Hitung sisa sebelum update
+    $sisaSebelum = $nota->total - $nota->totalbayar + $bayar->total;
+
+    // Validasi: jumlah baru tidak boleh lebih besar dari sisa
+    if ($request->total > $sisaSebelum) {
+        return back()
+        ->withErrors(['total' => 'Jumlah bayar yang diubah melebihi sisa yang harus dibayar.'])
+        ->withInput()
+        ->with('edit_bayar_no', $no);
+    }
+
+    
     DB::beginTransaction();
     try {
         $bayar = Dbayarbeli::where('no', $no)->firstOrFail();
