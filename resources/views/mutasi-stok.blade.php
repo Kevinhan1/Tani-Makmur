@@ -98,8 +98,8 @@
 									<td class="px-3 py-2">{{ \Carbon\Carbon::parse($row['tanggal'])->format('d-m-Y') }}</td>
 									<td class="px-3 py-2">{{ $row['noref'] }}</td>
 									<td class="px-3 py-2">{{ $row['namabarang'] }}</td>
-									<td class="px-3 py-2 text-right">{{ $row['masuk'] }}</td>
-									<td class="px-3 py-2 text-right">{{ $row['keluar'] }}</td>
+									<td class="px-3 py-2 text-right text-green-600">{{ $row['masuk'] }}</td>
+									<td class="px-3 py-2 text-right text-red-600">{{ $row['keluar'] }}</td>
 									<td class="px-3 py-2">{{ $row['jenis'] }}</td>
 									<td class="px-3 py-2">{{ $row['keterangan'] }}</td>
 									</tr>

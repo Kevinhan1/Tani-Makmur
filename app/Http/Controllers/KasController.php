@@ -53,7 +53,18 @@ class KasController extends Controller
             $query->where('jenis', $request->jenis);
         }
 
-        $kas = $query->paginate(15)->withQueryString();
+        // Ambil halaman saat ini dari request
+        $page = $request->get('page', 1);
+        $perPage = 15;
+        $offset = ($page - 1) * $perPage;
+
+        // Clone query untuk hitung saldo kumulatif sampai sebelum halaman ini
+        $saldoTambahan = (clone $query)->limit($offset)->sum(DB::raw('masuk - keluar'));
+
+        // Tambahkan ke saldo awal
+        $saldoAwal += $saldoTambahan;
+
+        $kas = $query->paginate($perPage)->withQueryString();
 
         return view('kas', compact('kas', 'rekeningList', 'saldoAwal', 'saldoRekening'));
     }

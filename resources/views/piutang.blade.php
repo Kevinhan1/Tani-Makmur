@@ -52,14 +52,14 @@
 				
 
     {{-- Filter Tanggal --}}
-    <form method="GET" action="{{ route('laporan-penjualan.index') }}" class="flex flex-wrap gap-4 mb-6 items-end">
+    <form method="GET" action="{{ route('piutang.index') }}" class="flex flex-wrap gap-4 mb-6 items-end">
 									<div>
 													<label class="block text-sm">Dari Tanggal</label>
-													<input type="date" name="dari" value="{{ request('tanggal_awal', date('Y-m-d', strtotime('-7 days'))) }}" class="border px-2 py-1 rounded">
+													<input type="date" name="dari" value="{{ request('dari', date('Y-m-d', strtotime('-7 days'))) }}" class="border px-2 py-1 rounded">
 									</div>
 									<div>
 													<label class="block text-sm">Sampai Tanggal</label>
-													<input type="date" name="sampai"  value="{{ request('tanggal_akhir', date('Y-m-d')) }}" class="border px-2 py-1 rounded">
+													<input type="date" name="sampai" value="{{ request('sampai', date('Y-m-d')) }}" class="border px-2 py-1 rounded">
 									</div>
 									<div>
 													<label class="block text-sm">Cari Pelanggan</label>

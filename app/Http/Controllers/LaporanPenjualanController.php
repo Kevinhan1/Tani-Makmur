@@ -6,32 +6,40 @@ use Illuminate\Http\Request;
 use App\Models\Hjual;
 use App\Models\Djual;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 
 class LaporanPenjualanController extends Controller
 {
     public function index(Request $request)
-				{
-								$query = Hjual::with('pelanggan');
+	{
 
-								if ($request->filled('dari') && $request->filled('sampai')) {
-												$query->whereBetween('tanggal', [$request->dari, $request->sampai]);
-								}
+        $user = Session::get('user');
 
-								if ($request->filled('search')) {
-												$query->whereHas('pelanggan', function ($q) use ($request) {
-																$q->where('namapelanggan', 'like', '%' . $request->search . '%');
-												});
-								}
+        if (!session()->has('user')) {
+			return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu');
+		}
+        
+	$query = Hjual::with('pelanggan');
 
-								$data = $query->orderBy('tanggal', 'desc')->paginate(15)->withQueryString();
+	if ($request->filled('dari') && $request->filled('sampai')) {
+		$query->whereBetween('tanggal', [$request->dari, $request->sampai]);
+	}
 
-								return view('laporan-penjualan', [
-												'data' => $data,
-												'dari' => $request->dari,
-												'sampai' => $request->sampai,
-												'search' => $request->search
-								]);
-				}
+        if ($request->filled('search')) {
+            $query->whereHas('pelanggan', function ($q) use ($request) {
+            $q->where('namapelanggan', 'like', '%' . $request->search . '%');
+		});
+	}
+
+	$data = $query->orderBy('tanggal', 'desc')->paginate(15)->withQueryString();
+
+	return view('laporan-penjualan', [
+			'data' => $data,
+			'dari' => $request->dari,
+			'sampai' => $request->sampai,
+			'search' => $request->search
+		]);
+	}
 
     public function detail($notajual)
     {

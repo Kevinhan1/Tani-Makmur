@@ -15,10 +15,18 @@
 <body>
     <h2>Tani Makmur</h2>
     <h3>Nota Penjualan: {{ $hjual->notajual }}</h3>
-    <p>Tanggal: {{ \Carbon\Carbon::parse($hjual->tanggal)->format('d-m-Y') }}</p>
-    <p>Pelanggan: {{ $hjual->pelanggan->namapelanggan }}</p>
-    <p>No Polisi: {{ $hjual->nopol ?? '-' }}</p>
-    <p>Supir: {{ $hjual->supir ?? '-' }}</p>
+    <table style="width: 100%; margin-bottom: 15px;">
+    <tr>
+        <td style="width: 50%;">
+            <p><strong>Tanggal:</strong> {{ \Carbon\Carbon::parse($hjual->tanggal)->format('d-m-Y') }}</p>
+            <p><strong>Pelanggan:</strong> {{ $hjual->pelanggan->namapelanggan }}</p>
+        </td>
+        <td style="width: 50%; text-align: right;">
+            <p><strong>No Polisi:</strong> {{ $hjual->nopol ?? '-' }}</p>
+            <p><strong>Supir:</strong> {{ $hjual->supir ?? '-' }}</p>
+        </td>
+    </tr>
+</table>
 
     <table>
         <thead>

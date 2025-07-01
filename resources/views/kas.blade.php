@@ -142,7 +142,6 @@
                     <td colspan="8" class="text-center text-gray-500 py-4">Tidak ada data kas.</td>
                 </tr>
             @endforelse
-
         </tbody>
     </table>
 </div>

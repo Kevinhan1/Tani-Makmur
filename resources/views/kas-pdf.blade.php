@@ -70,24 +70,27 @@
             </tr>
         </thead>
         <tbody>
-            @php $saldo = 0; @endphp
-            @forelse ($kas as $item)
-															<tr>
-																			<td>{{ \Carbon\Carbon::parse($item->tanggal)->format('d-m-Y') }}</td>
-																			<td>{{ $item->nogenerate }}</td>
-																			<td>{{ $item->noreferensi }}</td>
-																			<td class="text-align-left">{{ $item->keterangan }}</td>
-																			<td class="text-align-left">{{ $item->rekening->namarekening ?? '-' }}</td>
-																			<td class="text-align-left">{{ $item->jenis }}</td>
-																			<td class="text-green text-align-left">Rp{{ number_format($item->masuk, 0, ',', '.') }}</td>
-																			<td class="text-red text-align-left">Rp{{ number_format($item->keluar, 0, ',', '.') }}</td>
-																			<td class="text-align-left">Rp{{ number_format($saldo, 0, ',', '.') }}</td>
-															</tr>
-											@empty
-															<tr>
-																			<td colspan="9" style="text-align:center">Tidak ada data.</td>
-															</tr>
-											@endforelse
+            @php $saldo = $saldoAwal ?? 0; @endphp
+@forelse ($kas as $item)
+    @php
+        $saldo += $item->masuk - $item->keluar;
+    @endphp
+    <tr>
+        <td>{{ \Carbon\Carbon::parse($item->tanggal)->format('d-m-Y') }}</td>
+        <td>{{ $item->nogenerate }}</td>
+        <td>{{ $item->noreferensi }}</td>
+        <td class="text-align-left">{{ $item->keterangan }}</td>
+        <td class="text-align-left">{{ $item->rekening->namarekening ?? '-' }}</td>
+        <td class="text-align-left">{{ $item->jenis }}</td>
+        <td class="text-green text-align-left">Rp{{ number_format($item->masuk, 0, ',', '.') }}</td>
+        <td class="text-red text-align-left">Rp{{ number_format($item->keluar, 0, ',', '.') }}</td>
+        <td class="text-align-left">Rp{{ number_format($saldo, 0, ',', '.') }}</td>
+    </tr>
+@empty
+    <tr>
+        <td colspan="9" style="text-align:center">Tidak ada data.</td>
+    </tr>
+@endforelse
         </tbody>
     </table>
 </body>
