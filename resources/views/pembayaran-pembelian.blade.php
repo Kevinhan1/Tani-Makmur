@@ -143,11 +143,19 @@
             <input type="hidden" name="notabeli" id="formNotabeli">
             <div class="mb-4">
                 <label class="block text-sm font-medium">Tanggal Nota</label>
-                <input type="text" id="formTanggalNota" class="w-full border rounded px-2 py-1 bg-gray-100" readonly>
+                <input type="text" id="formTanggalNota" class="w-full border rounded px-2 py-1 bg-gray-100" value="{{ old('tanggalnota',  date('Y-m-d')) }}" readonly>
             </div>
             <div class="mb-4">
                 <label class="block text-sm font-medium">Tanggal Bayar</label>
-                <input type="date" name="tanggal_bayar" value="{{ date('Y-m-d') }}" class="w-full border rounded px-2 py-1" required>
+                <input type="date" name="tanggal_bayar" value="{{ old('tanggal',  date('Y-m-d')) }}" class="w-full border rounded px-2 py-1" required>
+                @error('tanggal_bayar')
+                    <div class="text-red-600 text-sm mt-1 bg-white p-2 rounded shadow">{{ $message }}</div>
+                    <script>
+                        window.addEventListener('DOMContentLoaded', () => {
+                            document.getElementById('modalBayar').classList.remove('hidden');
+                        });
+                    </script>
+                @enderror
             </div>
             <div class="mb-4">
                 <label class="block text-sm font-medium">Rekening</label>
@@ -157,6 +165,14 @@
                         <option value="{{ $rekening->koderekening }}">{{ $rekening->namarekening }}</option>
                     @endforeach
                 </select>
+                @error('koderekening')
+                    <div class="text-red-600 text-sm mt-1 bg-white p-2 rounded shadow">{{ $message }}</div>
+                    <script>
+                        window.addEventListener('DOMContentLoaded', () => {
+                            document.getElementById('modalBayar').classList.remove('hidden');
+                        });
+                    </script>
+                @enderror
             </div>
             <div class="mb-4">
                 <label class="block text-sm font-medium">Jumlah Bayar</label>

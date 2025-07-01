@@ -144,42 +144,43 @@
             
             <div class="mb-4">
                 <label for="nobiaya" class="block text-sm font-medium">No Biaya</label>
-                <input type="text" name="nobiaya" id="nobiaya" class="w-full border rounded px-3 py-2 bg-gray-100" value="{{ $nextCode }}" readonly>
+                <input type="text" name="nobiaya" id="nobiaya" class="w-full border rounded px-3 py-2 bg-gray-100" value="{{ old('nobiaya' ,$nextCode) }}" readonly>
             </div>
 
             <div class="mb-4">
                 <label for="tanggal" class="block text-sm font-medium">Tanggal</label>
-                <input type="date" name="tanggal" id="tanggal" class="w-full border rounded px-3 py-2" value="{{ date('Y-m-d') }}" required >
+                <input type="date" name="tanggal" id="tanggal" class="w-full border rounded px-3 py-2" value="{{ old('tanggal', date('Y-m-d')) }}" required >
             </div>
 
             <div class="mb-4">
                 <label for="koderekening" class="block text-sm font-medium">Rekening</label>
                 <select name="koderekening" id="koderekening" class="w-full border rounded px-3 py-2" required>
                     <option value="">-- Pilih Rekening --</option>
-                    @foreach ($rekening as $rek)
-                        <option value="{{ $rek->koderekening }}">{{ $rek->namarekening }}</option>
-                    @endforeach
+                        @foreach ($rekening as $rek)
+                            <option value="{{ $rek->koderekening }}" {{ old('koderekening') == $rek->koderekening ? 'selected' : '' }}>
+                                {{ $rek->namarekening }}
+                            </option>
+                        @endforeach
                 </select>
             </div>
 
             <div class="mb-4">
                 <label for="keterangan" class="block text-sm font-medium">Keterangan</label>
-                <textarea name="keterangan" id="keterangan" rows="3" class="w-full border rounded px-3 py-2" required></textarea>
+                <textarea name="keterangan" id="keterangan" rows="3" class="w-full border rounded px-3 py-2" required>{{ old('keterangan') }}</textarea>
             </div>
+
 
             <div class="mb-4">
                 <label for="total" class="block text-sm font-medium">Total</label>
-                <input type="number" step="0.01" name="total" id="total" class="w-full border rounded px-3 py-2 text-left" required>
+                <input type="number" step="0.01" name="total" id="total"
+                    class="w-full border rounded px-3 py-2 text-left @error('total') border-red-500 @enderror"
+                    value="{{ old('total') }}"
+                    required>
                 @error('total')
                     <div class="text-red-600 text-sm mt-1 bg-white p-2 rounded shadow">{{ $message }}</div>
-                    <script>
-                        // Otomatis buka modal jika ada error
-                        window.addEventListener('DOMContentLoaded', () => {
-                            updateActionButtons(); // supaya tombol Tambah muncul saat load awal
-                        });
-                    </script>
                 @enderror
             </div>
+
             <div class="flex justify-end space-x-2">
                 <button type="submit" id="submitBtn" class="px-4 py-2 bg-[#89E355] text-white rounded hover:bg-[#7ED242]">Simpan</button>
                 <button type="button" onclick="toggleModal()" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Batal</button>
@@ -306,6 +307,13 @@ function updateActionButtons() {
         }
     }
 }
+
+@if ($errors->any())
+    window.addEventListener('DOMContentLoaded', () => {
+        // Jika ada error validasi, buka kembali modal form Tambah/Edit
+        document.getElementById('modalForm').classList.remove('hidden');
+    });
+@endif
 
 
 function showConfirmDelete(message) {

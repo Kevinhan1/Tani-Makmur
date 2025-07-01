@@ -150,7 +150,7 @@
 
                 <div class="mb-4">
                     <label for="tanggal" class="block text-sm font-medium">Tanggal</label>
-                    <input type="date" name="tanggal" id="tanggal" class="w-full border rounded px-3 py-2" required value="{{ date('Y-m-d') }}">
+                    <input type="date" name="tanggal" id="tanggal" class="..." required value="{{ old('tanggal', date('Y-m-d')) }}">
                 </div>
 
                 <div class="mb-4">
@@ -158,7 +158,9 @@
                     <select name="rekeningasal" id="rekening_asal" class="w-full border rounded px-3 py-2" required>
                         <option value="">-- Pilih Rekening Asal --</option>
                         @foreach ($rekening as $rek)
-                            <option value="{{ $rek->koderekening }}">{{ $rek->namarekening }}</option>
+                            <option value="{{ $rek->koderekening }}" {{ old('rekeningasal') == $rek->koderekening ? 'selected' : '' }}>
+                                {{ $rek->namarekening }}
+                            </option>
                         @endforeach
                     </select>
                 </div>
@@ -168,25 +170,26 @@
                     <select name="rekeningtujuan" id="rekening_tujuan" class="w-full border rounded px-3 py-2" required>
                         <option value="">-- Pilih Rekening Tujuan --</option>
                         @foreach ($rekening as $rek)
-                            <option value="{{ $rek->koderekening }}">{{ $rek->namarekening }}</option>
+                            <option value="{{ $rek->koderekening }}" {{ old('rekeningtujuan') == $rek->koderekening ? 'selected' : '' }}>
+                                {{ $rek->namarekening }}
+                            </option>
                         @endforeach
                     </select>
                 </div>
 
                 <div class="mb-4">
                     <label for="keterangan" class="block text-sm font-medium">Keterangan</label>
-                    <textarea name="keterangan" id="keterangan" rows="3" class="w-full border rounded px-3 py-2" required></textarea>
+                    <textarea name="keterangan" id="keterangan" rows="3" class="w-full border rounded px-3 py-2" required>{{ old('keterangan') }}</textarea>
                 </div>
 
                 <div class="mb-4">
                     <label for="total" class="block text-sm font-medium">Total</label>
-                    <input type="number" step="0.01" name="total" id="total" class="w-full border rounded px-3 py-2 text-left" required>
+                    <input type="number" step="0.01" name="total" id="total" class="w-full border rounded px-3 py-2 text-left" required value="{{ old('total') }}">
                     @error('total')
                         <div class="text-red-600 text-sm mt-1 bg-white p-2 rounded shadow">{{ $message }}</div>
                         <script>
-                            // Otomatis buka modal jika ada error
                             window.addEventListener('DOMContentLoaded', () => {
-                                updateActionButtons();
+                                toggleModal(); // ⬅️ BUKA MODAL SAAT ADA ERROR
                             });
                         </script>
                     @enderror
@@ -409,10 +412,19 @@
 
     function confirmSubmit() {
         const total = parseFloat(document.getElementById('total').value);
+        const rekeningAsal = document.getElementById('rekening_asal').value;
+        const rekeningTujuan = document.getElementById('rekening_tujuan').value;
+
     if (isNaN(total) || total <= 0) {
         showModalAlert("Total harus lebih dari 0.");
         return false;
     }
+
+    if (rekeningAsal === rekeningTujuan && rekeningAsal !== '') {
+        showModalAlert("Rekening tujuan tidak boleh sama dengan rekening asal.");
+        return false;
+    }
+
     return true;
 }
     </script>

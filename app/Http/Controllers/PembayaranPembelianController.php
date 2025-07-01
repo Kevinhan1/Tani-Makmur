@@ -66,6 +66,28 @@ class PembayaranPembelianController extends Controller
         'total_bayar' => 'required|numeric|min:1'
     ]);
 
+    $errors = [];
+
+    // Validasi tanggal bayar
+    if (!$request->tanggal_bayar) {
+        $errors['tanggal_bayar'] = 'Pilih tanggal bayar.';
+    }
+
+    // Validasi rekening
+    if (!$request->koderekening) {
+        $errors['koderekening'] = 'Pilih rekening.';
+    }
+
+    // Validasi total bayar
+    if (!$request->total_bayar || $request->total_bayar < 1) {
+        $errors['total_bayar'] = 'Total bayar minimal 1.';
+    }
+
+    // Cek jika error ditemukan
+    if (!empty($errors)) {
+        return back()->withErrors($errors)->withInput();
+    }
+    
     // Cek saldo rekening
     $rekening = Rekening::where('koderekening', $request->koderekening)->first();
 

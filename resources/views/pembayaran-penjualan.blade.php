@@ -130,11 +130,19 @@
             <input type="hidden" name="notajual" id="formNotajual">
             <div class="mb-4">
                 <label class="block text-sm font-medium">Tanggal Nota</label>
-                <input type="text" id="formTanggalNota" class="w-full border rounded px-2 py-1 bg-gray-100" readonly>
+                <input type="text" id="formTanggalNota" class="w-full border rounded px-2 py-1 bg-gray-100" value="{{ old('tanggalnota', date('Y-m-d')) }}"readonly>
             </div>
             <div class="mb-4">
                 <label class="block text-sm font-medium">Tanggal Bayar</label>
-                <input type="date" name="tanggal_bayar" value="{{ date('Y-m-d') }}" class="w-full border rounded px-2 py-1" required>
+                <input type="date" name="tanggal_bayar" value="{{ old('tanggal', date('Y-m-d')) }}" class="w-full border rounded px-2 py-1" required>
+                @error('tanggal_bayar')
+                    <div class="text-red-600 text-sm mt-1 bg-white p-2 rounded shadow">{{ $message }}</div>
+                    <script>
+                        window.addEventListener('DOMContentLoaded', () => {
+                            document.getElementById('modalBayar').classList.remove('hidden');
+                        });
+                    </script>
+                @enderror
             </div>
             <div class="mb-4">
                 <label class="block text-sm font-medium">Rekening</label>
@@ -144,6 +152,14 @@
                         <option value="{{ $rekening->koderekening }}">{{ $rekening->namarekening }}</option>
                     @endforeach
                 </select>
+                    @error('koderekening')
+                    <div class="text-red-600 text-sm mt-1 bg-white p-2 rounded shadow">{{ $message }}</div>
+                    <script>
+                        window.addEventListener('DOMContentLoaded', () => {
+                            document.getElementById('modalBayar').classList.remove('hidden');
+                        });
+                    </script>
+                @enderror
             </div>
             <div class="mb-4">
                 <label class="block text-sm font-medium">Jumlah Bayar</label>
@@ -214,6 +230,18 @@
         <button class="absolute top-2 right-2 text-gray-500" onclick="closeModalEditBayar()">✕</button>
     </div>
 </div>
+
+
+{{-- Modal Validasi Tanggal --}}
+<div id="modalValidasi" class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center hidden z-50">
+    <div class="bg-white rounded shadow p-6 w-[90%] md:w-[400px] relative text-center">
+        <h2 class="text-lg font-semibold mb-4 text-red-600">Peringatan</h2>
+        <p id="validasiMessage" class="mb-4 text-sm text-gray-700"></p>
+        <button onclick="closeValidasiModal()" class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-sm text-gray-800">Tutup</button>
+    </div>
+</div>
+
+
 
 {{-- Modal Konfirmasi Simpan --}}
 <div id="modalKonfirmasiSimpan" class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center hidden z-50">
@@ -291,6 +319,29 @@
     function openModalKonfirmasi() {
         document.getElementById('modalKonfirmasiSimpan').classList.remove('hidden');
     }
+        function openValidasiModal(pesan) {
+        document.getElementById('validasiMessage').innerText = pesan;
+        document.getElementById('modalValidasi').classList.remove('hidden');
+    }
+
+    function closeValidasiModal() {
+        document.getElementById('modalValidasi').classList.add('hidden');
+    }
+
+    document.getElementById('filterForm').addEventListener('submit', function(e) {
+        const tglAwal = document.querySelector('[name="tanggal_awal"]').value;
+        const tglAkhir = document.querySelector('[name="tanggal_akhir"]').value;
+
+        if (tglAwal && tglAkhir) {
+            const awal = new Date(tglAwal);
+            const akhir = new Date(tglAkhir);
+
+            if (awal > akhir) {
+                e.preventDefault();
+                openValidasiModal("Tanggal awal tidak boleh melebihi tanggal akhir.");
+            }
+        }
+    });
 
     function closeModalKonfirmasi() {
         document.getElementById('modalKonfirmasiSimpan').classList.add('hidden');

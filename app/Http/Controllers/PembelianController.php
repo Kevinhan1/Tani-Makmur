@@ -175,7 +175,7 @@ class PembelianController extends Controller
             ->map(function ($item) {
                 return [
                     'namabarang' => $item->barang->namabarang ?? '-',
-                    'qty' => $item->qty,
+                    'qty' => $item->qty + $item->qtyjual, // << tambahkan qtyjual
                     'hargabeli' => $item->hargabeli,
                 ];
             });

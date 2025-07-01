@@ -54,6 +54,28 @@ class PembayaranPenjualanController extends Controller
 
         $rekening = Rekening::where('koderekening', $request->koderekening)->first();
 
+        $errors = [];
+
+        // Validasi tanggal bayar
+        if (!$request->tanggal_bayar) {
+            $errors['tanggal_bayar'] = 'Pilih tanggal bayar.';
+        }
+
+        // Validasi rekening
+        if (!$request->koderekening) {
+            $errors['koderekening'] = 'Pilih rekening.';
+        }
+
+        // Validasi total bayar
+        if (!$request->total_bayar || $request->total_bayar < 1) {
+            $errors['total_bayar'] = 'Total bayar minimal 1.';
+        }
+
+        // Cek jika error ditemukan
+        if (!empty($errors)) {
+            return back()->withErrors($errors)->withInput();
+        }
+        
         if ($request->total_bayar > $rekening->saldo) {
             return back()->withErrors(['total_bayar' => 'Saldo tidak cukup untuk melakukan pembayaran.'])->withInput();
         }
