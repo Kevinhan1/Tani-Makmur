@@ -180,8 +180,8 @@ public function update(Request $request, $nopindahbuku)
     
     public function exportPdf(Request $request)
     {
-        $tanggal_awal = $request->input('tanggal_awal');
-        $tanggal_akhir = $request->input('tanggal_akhir');
+        $tanggal_awal = $request->input('tanggal_awal') ?? date('Y-m-d', strtotime('-7 days'));
+        $tanggal_akhir = $request->input('tanggal_akhir') ?? date('Y-m-d');
 
         $query = PindahSaldo::with(['rekeningAsal', 'rekeningTujuan', 'pengguna'])
             ->when($tanggal_awal, function ($q) use ($tanggal_awal) {

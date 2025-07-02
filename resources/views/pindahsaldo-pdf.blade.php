@@ -14,7 +14,12 @@
 </head>
 <body>
     <h2 style="text-align: center;">Laporan Pindah Saldo</h2>
-    <p>Periode: {{ $tanggal_awal ?? '-' }} s/d {{ $tanggal_akhir ?? '-' }}</p>
+    <p>
+    Periode: 
+    {{ $tanggal_awal ? \Carbon\Carbon::parse($tanggal_awal)->format('d-m-Y') : '-' }} 
+    s/d 
+    {{ $tanggal_akhir ? \Carbon\Carbon::parse($tanggal_akhir)->format('d-m-Y') : '-' }}
+    </p>
 
     <table>
         <thead>

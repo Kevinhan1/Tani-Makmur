@@ -71,58 +71,60 @@ class KasController extends Controller
 
 
     public function exportPdf(Request $request)
-    {   
+{
+    // ⏱️ Set default tanggal jika tidak ada input dari user
+    $tanggal_awal = $request->input('tanggal_awal') ?? date('Y-m-d', strtotime('-7 days'));
+    $tanggal_akhir = $request->input('tanggal_akhir') ?? date('Y-m-d');
 
-        // Hitung Saldo Awal
-        $saldoAwal = 0;
-        if ($request->filled('tanggal_awal')) {
-            $saldoAwal = MutasiRekening::when($request->filled('rekening'), function ($q) use ($request) {
-                    $q->where('koderekening', $request->rekening);
-                })
-                ->where('tanggal', '<', $request->tanggal_awal)
-                ->sum(DB::raw('masuk - keluar'));
-        }
+    // 🔢 Hitung Saldo Awal
+    $saldoAwal = MutasiRekening::when($request->filled('rekening'), function ($q) use ($request) {
+            $q->where('koderekening', $request->rekening);
+        })
+        ->where('tanggal', '<', $tanggal_awal)
+        ->sum(DB::raw('masuk - keluar'));
 
-        // Hitung Saldo Akhir
-        if ($request->filled('rekening')) {
-            $rekening = Rekening::where('koderekening', $request->rekening)->first();
-            $saldoRekening = $rekening?->saldo ?? 0;
-        } else {
-            $saldoRekening = Rekening::sum('saldo');
-        }
-
-        $query = MutasiRekening::with('rekening')->orderBy('tanggal');
-
-        if ($request->filled('tanggal_awal') && $request->filled('tanggal_akhir')) {
-            $query->whereBetween('tanggal', [$request->tanggal_awal, $request->tanggal_akhir]);
-        }
-
-        if ($request->filled('rekening')) {
-            $query->where('koderekening', $request->rekening);
-        }
-
-        if ($request->filled('jenis')) {
-        $query->where('jenis', $request->jenis);
-        }
-        
-        $rekeningNama = 'Semua';
-            if ($request->filled('rekening')) {
-                $rek = Rekening::where('koderekening', $request->rekening)->first();
-                $rekeningNama = $rek?->namarekening ?? 'Tidak ditemukan';
-            }
-
-        $kas = $query->get();
-
-        $pdf = Pdf::loadView('kas-pdf', [
-            'kas' => $kas,
-            'tanggalAwal' => $request->tanggal_awal,
-            'tanggalAkhir' => $request->tanggal_akhir,
-            'rekeningNama' => $rekeningNama,
-            'saldoAwal' => $saldoAwal,
-            'saldoRekening' => $saldoRekening,
-            'jenis' => $request->jenis,
-        ])->setPaper('A4', 'portrait');
-
-        return $pdf->stream('kas-' . now()->format('Ymd_His') . '.pdf');
+    // 💰 Hitung Saldo Akhir
+    if ($request->filled('rekening')) {
+        $rekening = Rekening::where('koderekening', $request->rekening)->first();
+        $saldoRekening = $rekening?->saldo ?? 0;
+    } else {
+        $saldoRekening = Rekening::sum('saldo');
     }
+
+    // 🔍 Query data kas sesuai filter
+    $query = MutasiRekening::with('rekening')->orderBy('tanggal');
+
+    $query->whereBetween('tanggal', [$tanggal_awal, $tanggal_akhir]);
+
+    if ($request->filled('rekening')) {
+        $query->where('koderekening', $request->rekening);
+    }
+
+    if ($request->filled('jenis')) {
+        $query->where('jenis', $request->jenis);
+    }
+
+    $kas = $query->get();
+
+    // 📋 Nama rekening (untuk ditampilkan di PDF)
+    $rekeningNama = 'Semua';
+    if ($request->filled('rekening')) {
+        $rek = Rekening::where('koderekening', $request->rekening)->first();
+        $rekeningNama = $rek?->namarekening ?? 'Tidak ditemukan';
+    }
+
+    // 🧾 Cetak PDF
+    $pdf = Pdf::loadView('kas-pdf', [
+        'kas' => $kas,
+        'tanggalAwal' => $tanggal_awal,
+        'tanggalAkhir' => $tanggal_akhir,
+        'rekeningNama' => $rekeningNama,
+        'saldoAwal' => $saldoAwal,
+        'saldoRekening' => $saldoRekening,
+        'jenis' => $request->jenis,
+    ])->setPaper('A4', 'portrait');
+
+    return $pdf->stream('kas-' . now()->format('Ymd_His') . '.pdf');
+}
+
 }

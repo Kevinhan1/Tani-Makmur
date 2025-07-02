@@ -15,7 +15,7 @@
 <body>
     <h2>Tani Makmur</h2>
     <h3>Nota Pembelian: {{ $notabeli }}</h3>
-    <p>Tanggal: {{ $tanggal }}</p>
+    <p><strong>Tanggal:</strong> {{ \Carbon\Carbon::parse($tanggal)->format('d-m-Y') }}</p>
     <p>Pemasok: {{ $namapemasok }}</p>
 
     <table>

@@ -12,7 +12,11 @@
 </head>
 <body>
     <h2 style="text-align: center;">Laporan Biaya</h2>
-    <p>Periode: {{ $tanggalAwal ?? '-' }} s/d {{ $tanggalAkhir ?? '-' }}</p>
+    <p>Periode: 
+    {{ \Carbon\Carbon::parse($tanggalAwal)->format('d-m-Y') }} 
+    s/d 
+    {{ \Carbon\Carbon::parse($tanggalAkhir)->format('d-m-Y') }}
+    </p>
 
     <table>
         <thead>
@@ -29,7 +33,7 @@
             @foreach ($biaya as $item)
                 <tr>
                     <td>{{ $item->nobiaya }}</td>
-                    <td>{{ $item->tanggal }}</td>
+                    <td>{{ \Carbon\Carbon::parse($item->tanggal)->format('d-m-Y') }}</td>
                     <td>{{ $item->rekening->namarekening ?? '-' }}</td>
                     <td>{{ $item->keterangan }}</td>
                     <td>{{ number_format($item->total, 0, ',', '.') }}</td>

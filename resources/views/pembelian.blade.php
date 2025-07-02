@@ -369,6 +369,14 @@ function toggleHistory(show = true) {
     document.getElementById('modal-history').classList.toggle('hidden', !show);
 }
 
+function formatTanggal(tanggalString) {
+    const tanggal = new Date(tanggalString);
+    const day = String(tanggal.getDate()).padStart(2, '0');
+    const month = String(tanggal.getMonth() + 1).padStart(2, '0'); // Ingat: bulan dimulai dari 0
+    const year = tanggal.getFullYear();
+    return `${day}-${month}-${year}`;
+}
+
 // Bagian loadHistory di JS
 let currentPage = 1;
 const limit = 5;
@@ -395,7 +403,7 @@ function loadHistory(page = 1) {
                 tr.classList.add('border-b');
                 tr.innerHTML = `
                     <td class="px-4 py-2">${row.notabeli}</td>
-                    <td class="px-4 py-2">${row.tanggal}</td>
+                    <td class="px-4 py-2">${formatTanggal(row.tanggal)}</td>
                     <td class="px-4 py-2">${row.namapemasok}</td>
                     <td class="px-4 py-2 text-center">Rp ${formatRupiah(row.total)}</td>
                     <td class="px-4 py-2 text-center">
