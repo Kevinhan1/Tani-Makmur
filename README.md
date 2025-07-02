@@ -1,61 +1,143 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
-
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="300" alt="Laravel Logo">
 </p>
 
-## About Laravel
+# 🧾 Tani Makmur — Aplikasi Manajemen Data, Transaksi & Laporan
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Aplikasi Laravel untuk mengelola transaksi penjualan, pembelian, pembayaran, mutasi rekening, laporan kas, dan piutang.  
+Cocok digunakan dalam lingkungan lokal (LAN) dengan banyak pengguna.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 🚀 Fitur Utama
 
-## Learning Laravel
+- ✅ Login multi-user (role admin & pengguna)
+- 📦 Manajemen barang, pelanggan, pemasok, rekening, dan pengguna
+- 💰 Transaksi: pembelian, penjualan, pembayaran, biaya, dan pindah saldo
+- 📊 Laporan: mutasi rekening, mutasi stok, laporan penjualan, kas, piutang
+- 🧾 Cetak PDF invoice pembelian, penjualan, kas, dan lainnya
+- 📁 Ekspor laporan ke format PDF
+- 📡 Support akses via LAN (multi-user dengan database bersama)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+---
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## 🛠️ Requirement
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+| Komponen   | Versi Minimum |
+|------------|----------------|
+| PHP        | 8.2+           |
+| Composer   | 2.0+           |
+| Laravel    | ^12            |
+| Database   | MySQL / MariaDB|
+| Ekstensi   | DomPDF         |
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## 📄 Modul Utama
 
-### Premium Partners
+- **Barang** — CRUD barang (dengan harga beli/jual dan status aktif)
+- **Penjualan** — Input penjualan, update stok, cetak invoice PDF
+- **Pembelian** — Input pembelian, histori pembelian, invoice
+- **Pembayaran** — Cicilan/diskon otomatis pada pembelian & penjualan
+- **Kas** — Rekap mutasi rekening, saldo awal/akhir, filter jenis transaksi
+- **Laporan** — Mutasi rekening, stok, penjualan (bisa diekspor PDF)
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development/)**
-- **[Active Logic](https://activelogic.com)**
+---
 
-## Contributing
+## 📤 Ekspor PDF
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Modul yang mendukung ekspor PDF:
 
-## Code of Conduct
+/biaya/pdf
+/pindahsaldo/pdf
+/kas/pdf
+/mutasi-rekening/pdf
+/mutasi-stok/pdf
+/laporan-penjualan/detail/{notajual}
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+ Pastikan DomPDF aktif dengan menjalankan:
+```bash
+composer require barryvdh/laravel-dompdf
 
-## Security Vulnerabilities
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+📂 Struktur Folder Penting
+Folder	Fungsi
+app/Http/Controllers	Logika aplikasi: Login, Barang, Kas, dll
+resources/views	Tampilan antarmuka (Blade)
+routes/web.php	Daftar rute aplikasi
+public/	Akses langsung dari browser
+database/sql	File database (jika disertakan)
 
-## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+⚙️ Instalasi Lokal (Laragon / XAMPP)
+Clone atau Extract Project
+
+Tempatkan di:
+
+C:\laragon\www\tani-makmur (untuk Laragon)
+
+htdocs\tani-makmur (untuk XAMPP)
+
+Install Dependency
+
+bash
+Copy
+Edit
+composer install
+Salin & Konfigurasi .env
+
+bash
+Copy
+Edit
+cp .env.example .env
+php artisan key:generate
+Edit bagian:
+
+makefile
+Copy
+Edit
+DB_DATABASE=tani_makmur
+DB_USERNAME=root
+DB_PASSWORD=
+Import Database
+Import file tani_makmur.sql melalui phpMyAdmin atau MySQL CLI.
+
+Jalankan Server Lokal
+
+bash
+Copy
+Edit
+php artisan serve
+Akses di browser: http://localhost:8000
+
+
+🌐 Jalankan di Jaringan LAN (Multi User)
+Jalankan server di host:
+
+bash
+Copy
+Edit
+php artisan serve --host=0.0.0.0 --port=8000
+Temukan IP lokal (misal 192.168.1.10)
+
+Dari komputer lain, akses:
+
+cpp
+Copy
+Edit
+http://192.168.1.10:8000
+
+
+🔐 Login Awal (Default)
+Nama Pengguna	Kata Kunci
+(diatur manual oleh admin utama)	
+
+Kata sandi terenkripsi. Kamu bisa:
+
+Mengganti langsung via database (password_hash()), atau
+
+Tambah user baru lewat menu pengguna.
+
+
+📬 Kontak Developer
+Silakan hubungi pengembang jika terjadi error atau membutuhkan support instalasi lokal & jaringan.
