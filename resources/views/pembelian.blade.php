@@ -158,9 +158,6 @@
             <button id="custom-modal-ok" class="bg-[#89E355] hover:bg-[#7ED242] text-white px-4 py-2 rounded">
                 OK
             </button>
-            <button id="custom-modal-cancel" class="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded">
-                Tidak
-            </button>
         </div>
     </div>
 </div>
