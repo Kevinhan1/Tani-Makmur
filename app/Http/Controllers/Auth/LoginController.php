@@ -11,20 +11,33 @@ use Illuminate\Support\Facades\Session;
 class LoginController extends Controller
 {
     // Menampilkan halaman login
-    public function showLoginForm()
+    public function showLoginForm(Request $request)
     {
+        $allowedIps = explode(',', env('ALLOWED_IPS'));
+        $clientIp = $request->ip();
+
+        if (!in_array($clientIp, $allowedIps)) {
+            abort(404, 'This page could not be found.');
+        }
+
         return view('pengguna.login');
     }
 
     // Proses login
     public function login(Request $request)
     {
+        $allowedIps = explode(',', env('ALLOWED_IPS'));
+        $clientIp = $request->ip();
+
+        if (!in_array($clientIp, $allowedIps)) {
+            abort(403, 'Akses ditolak. IP Anda tidak diizinkan.');
+        }
+
         $request->validate([
             'namapengguna' => 'required|string|max:255',
             'katakunci' => 'required|string|min:6',
         ]);
 
-        // Ambil user tanpa filter 'aktif'
         $user = DB::table('tpengguna')->where('namapengguna', $request->namapengguna)->first();
 
         if (!$user || !Hash::check($request->katakunci, $user->katakunci)) {
@@ -39,11 +52,9 @@ class LoginController extends Controller
         return redirect()->route('dashboard');
     }
 
-
     // Menangani logout
     public function logout()
     {
-        // Menghapus session
         Session::flush();
         return redirect()->route('login');
     }

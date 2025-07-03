@@ -96,6 +96,7 @@
                     <option 
                         value="{{ $ref->noref }}"
                         data-namabarang="{{ $ref->namabarang }}"
+                        data-stok="{{ $ref->qty }}"
                         data-hargajual="{{ $ref->hargajual }}"
                         data-konversi="{{ $ref->konversi ?? 0 }}">
                         {{ $ref->noref }}
@@ -106,6 +107,10 @@
         <div class="mb-4">
             <label for="namabarang" class="block text-sm font-medium">Nama Barang</label>
             <input type="text" id="namabarang" class="w-full border rounded px-3 py-2 bg-gray-100" readonly />
+        </div>
+        <div class="mb-4">
+            <label for="stok" class="block text-sm font-medium">Stok Tersedia</label>
+            <input type="number" id="stok" class="w-full border rounded px-3 py-2 bg-gray-100" readonly />
         </div>
         <div class="mb-4">
             <label for="qtyjual" class="block text-sm font-medium">Kuantitas</label>
@@ -508,16 +513,23 @@ new TomSelect('#noref', {
         const option = document.querySelector(`#noref option[value="${value}"]`);
         if (option) {
             const namaBarang = option.dataset.namabarang || '';
+            const stok = option.dataset.stok || '';
             const hargaJual = option.dataset.hargajual || '';
+
             document.getElementById('namabarang').value = namaBarang;
+            document.getElementById('stok').value = stok;
             document.getElementById('hargajual').value = hargaJual;
+
+
             document.getElementById('noref').dataset.namabarang = namaBarang;
         } else {
             document.getElementById('namabarang').value = '';
+            document.getElementById('stok').value = '';
             document.getElementById('hargajual').value = '';
             document.getElementById('noref').dataset.namabarang = '';
         }
     }
 });
+
 </script>
 @endsection
