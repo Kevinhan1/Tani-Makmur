@@ -126,7 +126,7 @@
 <div id="modalBayar" class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center hidden z-50">
     <div class="bg-white rounded shadow p-6 w-[90%] md:w-[500px] relative">
         <h2 class="text-xl font-semibold mb-4">Form Pembayaran</h2>
-        <form method="POST" action="{{ route('pembayaran-pembelian.store') }}">
+        <form method="POST" action="{{ secure_url('pembayaran-pembelian.store') }}">
             <div id="modalHistory" class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center hidden z-50">
                 <div class="bg-white rounded shadow p-6 w-[90%] md:w-[600px] relative max-h-[80vh] overflow-y-auto">
                     <h2 class="text-lg font-semibold mb-4">Riwayat Pembayaran</h2>

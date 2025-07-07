@@ -243,7 +243,7 @@ function toggleModal() {
 
 function openModalForAdd() {
     document.getElementById('modalTitle').innerText = 'Tambah Pelanggan';
-    document.getElementById('formDataPelanggan').action = "{{ route('pelanggan.store') }}";
+    document.getElementById('formDataPelanggan').action = "{{ secure_url(route('pelanggan.store', [], false)) }}";
     document.getElementById('formMethod').value = 'POST';
     document.getElementById('original_kodepelanggan').value = '';
 

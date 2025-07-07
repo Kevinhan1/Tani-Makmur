@@ -227,7 +227,7 @@ function toggleModal() {
 
 function openModalForAdd() {
     document.getElementById('modalTitle').innerText = 'Tambah Biaya';
-    document.getElementById('formDataBiaya').action = "{{ route('biaya.store') }}";
+    document.getElementById('formDataBiaya').action = "{{ secure_url(route('biaya.store', [], false)) }}";
     document.getElementById('formMethod').value = 'POST';
     document.getElementById('original_nobiaya').value = '';
 

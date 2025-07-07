@@ -187,7 +187,7 @@ function toggleModal() {
 
 function openModalForAdd() {
   document.getElementById('modalTitle').innerText = 'Tambah Pengguna';
-  document.getElementById('formData').action = "{{ route('pengguna.store') }}";
+  document.getElementById('formData').action = "{{ secure_url(route('pengguna.store', [], false)) }}";
   document.getElementById('formMethod').value = 'POST';
   document.getElementById('formId').value = '';
   document.getElementById('aktif').checked = false;

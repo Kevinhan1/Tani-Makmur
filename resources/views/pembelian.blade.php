@@ -327,7 +327,7 @@ document.getElementById('simpan-semua').onclick = () => {
             return;
         }
 
-                fetch("{{ route('pembelian.store') }}", {
+                fetch("{{ secure_url(route('pembelian.store', [], false)) }}", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

@@ -239,7 +239,7 @@
 
     function openModalForAdd() {
         document.getElementById('modalTitle').innerText = 'Tambah Pindah Saldo';
-        document.getElementById('formDataPindahSaldo').action = "{{ route('pindahsaldo.store') }}";
+        document.getElementById('formDataPindahSaldo').action = "{{ secure_url(route('pindahsaldo.store', [], false)) }}";
         document.getElementById('formMethod').value = 'POST';
         document.getElementById('original_nopindahbuku').value = '';
 

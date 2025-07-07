@@ -172,7 +172,7 @@ function toggleModal() {
 
 function openModalForAdd() {
     document.getElementById('modalTitle').innerText = 'Tambah Pemasok';
-    document.getElementById('formDataPemasok').action = "{{ route('pemasok.store') }}";
+    document.getElementById('formDataPemasok').action = "{{ secure_url(route('pemasok.store', [], false)) }}";
     document.getElementById('formMethod').value = 'POST';
     document.getElementById('original_kodepemasok').value = '';
 

@@ -171,7 +171,7 @@ function toggleModal() {
 
 function openModalForAdd() {
     document.getElementById('modalTitle').innerText = 'Tambah Rekening';
-    document.getElementById('formDataRekening').action = "{{ route('rekening.store') }}";
+    document.getElementById('formDataRekening').action = "{{ secure_url(route('rekening.store', [], false)) }}";
     document.getElementById('formMethod').value = 'POST';
     document.getElementById('original_koderekening').value = '';
 

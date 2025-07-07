@@ -299,7 +299,7 @@ document.getElementById('simpan-semua').addEventListener('click', () => {
         return showModal("Lengkapi semua data sebelum menyimpan.");
     }
 
-    fetch("{{ route('penjualan.store') }}", {
+    fetch("{{ secure_url(route('penjualan.store', [], false)) }}", {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
