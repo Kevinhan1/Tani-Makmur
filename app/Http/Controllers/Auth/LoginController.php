@@ -26,12 +26,12 @@ class LoginController extends Controller
     // Proses login
     public function login(Request $request)
     {
-        $allowedIps = explode(',', env('ALLOWED_IPS'));
-        $clientIp = $request->ip();
+        // $allowedIps = explode(',', env('ALLOWED_IPS'));
+        // $clientIp = $request->ip();
 
-        if (!in_array($clientIp, $allowedIps)) {
-            abort(403, 'Akses ditolak. IP Anda tidak diizinkan.');
-        }
+        // if (!in_array($clientIp, $allowedIps)) {
+        //     abort(403, 'Akses ditolak. IP Anda tidak diizinkan.');
+        // }
 
         $request->validate([
             'namapengguna' => 'required|string|max:255',
