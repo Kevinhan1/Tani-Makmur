@@ -59,7 +59,7 @@
     </div>
 
     {{-- FILTER FORM --}}
-    <form method="GET" action="{{ secure_url('biaya.index') }}" class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+    <form method="GET" action="{{ route('biaya.index') }}" class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
         <div>
             <label class="text-sm text-gray-600">Tanggal Awal</label>
             <input type="date" name="tanggal_awal" value="{{ request('tanggal_awal', date('Y-m-d', strtotime('-7 days'))) }}"
