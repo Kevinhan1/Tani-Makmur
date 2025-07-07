@@ -103,7 +103,10 @@ class BiayaController extends Controller
         // Simpan data biaya setelah lolos validasi saldo
         Biaya::create($data);
 
-        return redirect()->route('biaya.index')->with('success', 'Data biaya berhasil disimpan.');
+        return redirect()->route('biaya.index', [
+            'tanggal_awal' => $request->tanggal,
+            'tanggal_akhir' => $request->tanggal
+        ])->with('success', 'Data biaya berhasil disimpan.');
     }
 
 
