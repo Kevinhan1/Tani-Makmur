@@ -13,12 +13,12 @@ class LoginController extends Controller
     // Menampilkan halaman login
     public function showLoginForm(Request $request)
     {
-        $allowedIps = explode(',', env('ALLOWED_IPS'));
-        $clientIp = $request->ip();
+        // $allowedIps = explode(',', env('ALLOWED_IPS'));
+        // $clientIp = $request->ip();
 
-        if (!in_array($clientIp, $allowedIps)) {
-            abort(404, 'This page could not be found.');
-        }
+        // if (!in_array($clientIp, $allowedIps)) {
+        //     abort(404, 'This page could not be found.');
+        // }
 
         return view('pengguna.login');
     }
