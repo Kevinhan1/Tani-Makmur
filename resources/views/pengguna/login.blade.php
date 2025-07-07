@@ -32,7 +32,7 @@
         @endif
 
         <!-- Formulir Login -->
-        <form action="{{ route('login') }}" method="POST" class="flex flex-col items-center space-y-4">
+        <form action="{{ secure_url('login') }}" method="POST" class="flex flex-col items-center space-y-4">
             @csrf
 
             <!-- Nama Pengguna -->
