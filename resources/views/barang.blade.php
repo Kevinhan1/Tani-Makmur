@@ -194,7 +194,7 @@ function toggleModal() {
 // Buka modal untuk tambah barang
 function openModalForAdd() {
     document.getElementById('modalTitle').innerText = 'Tambah Barang';
-    document.getElementById('formDataBarang').action = "{{ route('barang.store') }}";
+    document.getElementById('formDataBarang').action = "{{ route('barang.store', [], true) }}";
     document.getElementById('formMethod').value = 'POST';
     document.getElementById('original_kodebarang').value = '';
 
