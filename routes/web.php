@@ -24,27 +24,14 @@ use App\Http\Controllers\PiutangController;
 use App\Http\Controllers\LaporanPenjualanController;
 
 
-
 // Landing page (halaman publik)
 Route::get('/', function () {
     return view('landing'); // asumsikan kamu punya file resources/views/landing.blade.php
 });
 
-
 // Rute untuk halaman login dan proses login
-Route::group([
-    'middleware' => function ($request, $next) {
-        $allowedIps = explode(',', env('ALLOWED_IPS'));
-        if (!in_array($request->ip(), $allowedIps)) {
-            return redirect('/'); // atau abort(403, 'Akses ditolak');
-        }
-        return $next($request);
-    }
-], function () {
-    Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-    Route::post('/login', [LoginController::class, 'login']);
-});
-
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [LoginController::class, 'login']);
 Route::get('logout', [LoginController::class, 'logout'])->name('logout');
 
 
