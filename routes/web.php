@@ -25,8 +25,12 @@ use App\Http\Controllers\LaporanPenjualanController;
 
 
 // Landing page (halaman publik)
+// Route::get('/', function () {
+//     return redirect()->route('login');
+// });
+
 Route::get('/', function () {
-    return redirect()->route('login');
+    return view('landing'); 
 });
 
 // Rute untuk halaman login dan proses login
