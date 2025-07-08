@@ -29,9 +29,6 @@ use App\Http\Controllers\LaporanPenjualanController;
 //     return redirect()->route('login');
 // });
 
-Route::get('/', function () {
-    return view('landing'); 
-});
 
 // Rute untuk halaman login dan proses login
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
